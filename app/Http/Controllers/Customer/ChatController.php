@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ChatMessage;
 use App\Models\ChatSession;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
 {
@@ -42,7 +43,7 @@ class ChatController extends Controller
         try {
             broadcast(new ChatQueueUpdated($this->getQueueData()));
         } catch (\Exception $e) {
-            logger()->warning('Broadcast chat queue gagal: ' . $e->getMessage());
+            Log::warning('Broadcast chat queue gagal: ' . ($e->getMessage() ?? 'Unknown error'));
         }
 
         return response()->json([
@@ -82,7 +83,7 @@ class ChatController extends Controller
         try {
             broadcast(new NewChatMessage($message, $session));
         } catch (\Exception $e) {
-            logger()->warning('Broadcast customer chat message gagal: ' . $e->getMessage());
+            Log::warning('Broadcast customer chat message gagal: ' . ($e->getMessage() ?? 'Unknown error'));
         }
 
         return response()->json([

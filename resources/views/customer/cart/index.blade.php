@@ -11,15 +11,19 @@
             <div class="text-7xl mb-4">🛍️</div>
             <h2 class="text-xl font-bold text-slate-700 mb-2">Keranjang Kosong</h2>
             <p class="text-slate-500 mb-6">Belum ada produk di keranjang Anda.</p>
-            <a href="{{ route('catalog') }}" class="px-8 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-2xl font-bold hover:shadow-lg transition-all">Mulai Belanja</a>
+            <a href="{{ route('catalog') }}" class="px-8 py-3 bg-linear-to-r from-sky-500 to-indigo-600 text-white rounded-2xl font-bold hover:shadow-lg transition-all">Mulai Belanja</a>
         </div>
     @else
         <div class="grid md:grid-cols-3 gap-6">
 
             {{-- Cart Items --}}
-            <div class="md:col-span-2 space-y-3">
+            <div class="md:col-span-2 space-y-3" id="cart-items-container">
                 @foreach($cart as $id => $item)
-                <div class="bg-white rounded-2xl border border-slate-100 p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
+                <div class="bg-white rounded-2xl border border-slate-100 p-4 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow cart-item"
+                     id="cart-item-{{ $id }}"
+                     data-id="{{ $id }}"
+                     data-price="{{ $item['price'] }}"
+                     data-type="{{ $item['type'] }}">
                     <div class="w-16 h-16 bg-slate-100 rounded-xl flex items-center justify-center shrink-0">
                         @if($item['image'])
                             <img src="{{ asset('storage/'.$item['image']) }}" class="w-full h-full object-contain rounded-xl">
@@ -37,17 +41,19 @@
                     </div>
 
                     <div class="flex items-center gap-2">
-                        {{-- Update quantity --}}
-                        <form action="{{ route('customer.cart.update', $id) }}" method="POST" class="flex items-center border border-slate-200 rounded-lg overflow-hidden">
-                            @csrf @method('PATCH')
-                            <button type="button" onclick="updateQty(this, -1)" class="px-2 py-1 hover:bg-slate-100 text-slate-600">−</button>
-                            <input type="number" name="quantity" value="{{ $item['quantity'] }}" min="1"
-                                onchange="this.form.submit()"
-                                class="w-10 text-center text-sm border-x border-slate-200 py-1 focus:outline-none">
-                            <button type="button" onclick="updateQty(this, 1)" class="px-2 py-1 hover:bg-slate-100 text-slate-600">+</button>
-                        </form>
+                        {{-- Quantity controls --}}
+                        <div class="flex items-center border border-slate-200 rounded-lg overflow-hidden">
+                            <button type="button" data-product-id="{{ $id }}" data-delta="-1"
+                                class="qty-btn px-2.5 py-1.5 hover:bg-slate-100 text-slate-600 font-bold transition-colors select-none"
+                                id="btn-minus-{{ $id }}">−</button>
+                            <span class="w-10 text-center text-sm py-1.5 border-x border-slate-200 font-semibold text-slate-700 qty-display"
+                                id="qty-{{ $id }}">{{ $item['quantity'] }}</span>
+                            <button type="button" data-product-id="{{ $id }}" data-delta="1"
+                                class="qty-btn px-2.5 py-1.5 hover:bg-slate-100 text-slate-600 font-bold transition-colors select-none"
+                                id="btn-plus-{{ $id }}">+</button>
+                        </div>
 
-                        <p class="text-sm font-bold text-slate-700 w-24 text-right">
+                        <p class="text-sm font-bold text-slate-700 w-24 text-right item-subtotal" id="subtotal-{{ $id }}">
                             Rp {{ number_format($item['price'] * $item['quantity'], 0, ',', '.') }}
                         </p>
 
@@ -77,24 +83,22 @@
 
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between text-slate-500">
-                            <span>{{ count($cart) }} item</span>
-                            <span>Rp {{ number_format($total, 0, ',', '.') }}</span>
+                            <span id="summary-count">{{ count($cart) }} item</span>
+                            <span id="summary-subtotal">Rp {{ number_format($total, 0, ',', '.') }}</span>
                         </div>
                         @php $hasPhysical = collect($cart)->contains(fn($i) => $i['type'] === 'physical'); @endphp
-                        @if($hasPhysical)
-                            <div class="flex justify-between text-slate-500">
-                                <span>Ongkir (estimasi)</span>
-                                <span>Rp 15.000</span>
-                            </div>
-                        @endif
+                        <div class="flex justify-between text-slate-500 {{ $hasPhysical ? '' : 'hidden' }}" id="shipping-row">
+                            <span>Ongkir (estimasi)</span>
+                            <span>Rp 15.000</span>
+                        </div>
                         <div class="border-t border-slate-100 pt-2 flex justify-between font-bold text-slate-800">
                             <span>Total</span>
-                            <span class="text-sky-600">Rp {{ number_format($total + ($hasPhysical ? 15000 : 0), 0, ',', '.') }}</span>
+                            <span class="text-sky-600" id="summary-total">Rp {{ number_format($total + ($hasPhysical ? 15000 : 0), 0, ',', '.') }}</span>
                         </div>
                     </div>
 
                     <a href="{{ route('customer.checkout') }}"
-                       class="mt-5 block text-center py-3.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-2xl hover:shadow-xl hover:shadow-sky-200 transition-all hover:-translate-y-0.5">
+                       class="mt-5 block text-center py-3.5 bg-linear-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-2xl hover:shadow-xl hover:shadow-sky-200 transition-all hover:-translate-y-0.5">
                         Lanjut Checkout →
                     </a>
 
@@ -107,12 +111,100 @@
 
 @push('scripts')
 <script>
-function updateQty(btn, delta) {
-    const input = btn.parentElement.querySelector('input');
-    const newVal = Math.max(1, parseInt(input.value) + delta);
-    input.value = newVal;
-    btn.closest('form').submit();
+const CSRF = '{{ csrf_token() }}';
+let updating = {};
+
+function formatRupiah(num) {
+    return 'Rp ' + num.toLocaleString('id-ID');
 }
+
+function recalcSummary() {
+    let total = 0;
+    let hasPhysical = false;
+    document.querySelectorAll('.cart-item').forEach(el => {
+        const price = parseFloat(el.dataset.price);
+        const qty   = parseInt(document.getElementById('qty-' + el.dataset.id).textContent);
+        total += price * qty;
+        if (el.dataset.type === 'physical') hasPhysical = true;
+    });
+
+    const shipping = hasPhysical ? 15000 : 0;
+    document.getElementById('summary-subtotal').textContent = formatRupiah(total);
+    document.getElementById('summary-total').textContent    = formatRupiah(total + shipping);
+
+    const shippingRow = document.getElementById('shipping-row');
+    if (shippingRow) {
+        shippingRow.classList.toggle('hidden', !hasPhysical);
+    }
+}
+
+async function changeQty(productId, delta) {
+    if (updating[productId]) return;
+
+    const qtyEl   = document.getElementById('qty-' + productId);
+    const current = parseInt(qtyEl.textContent);
+    const newQty  = current + delta;
+
+    if (newQty < 1) return;
+
+    // Optimistic UI
+    updating[productId] = true;
+    qtyEl.textContent = newQty;
+
+    const itemEl = document.getElementById('cart-item-' + productId);
+    const price  = parseFloat(itemEl.dataset.price);
+    document.getElementById('subtotal-' + productId).textContent = formatRupiah(price * newQty);
+    recalcSummary();
+
+    // Disable buttons
+    const btnMinus = document.getElementById('btn-minus-' + productId);
+    const btnPlus  = document.getElementById('btn-plus-' + productId);
+    btnMinus.disabled = true;
+    btnPlus.disabled  = true;
+    btnMinus.classList.add('opacity-40');
+    btnPlus.classList.add('opacity-40');
+
+    try {
+        const res = await fetch(`/cart/update/${productId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': CSRF,
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'text/html',
+            },
+            body: '_method=PATCH&quantity=' + newQty,
+            redirect: 'follow',
+        });
+
+        if (!res.ok) throw new Error('Update gagal');
+    } catch (e) {
+        // Revert on error
+        qtyEl.textContent = current;
+        document.getElementById('subtotal-' + productId).textContent = formatRupiah(price * current);
+        recalcSummary();
+
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-5 right-5 z-50 px-5 py-3 bg-red-500 text-white text-sm font-semibold rounded-2xl shadow-2xl';
+        toast.textContent = 'Gagal memperbarui jumlah. Coba lagi.';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    } finally {
+        updating[productId] = false;
+        btnMinus.disabled = false;
+        btnPlus.disabled  = false;
+        btnMinus.classList.remove('opacity-40');
+        btnPlus.classList.remove('opacity-40');
+    }
+}
+
+// Wire up qty buttons via event delegation (avoids inline onclick with Blade syntax)
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.qty-btn');
+    if (!btn) return;
+    const productId = parseInt(btn.dataset.productId);
+    const delta     = parseInt(btn.dataset.delta);
+    if (productId && delta) changeQty(productId, delta);
+});
 </script>
 @endpush
 @endsection

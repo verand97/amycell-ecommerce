@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ChatMessage;
 use App\Models\ChatSession;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ChatController extends Controller
 {
@@ -67,7 +68,7 @@ class ChatController extends Controller
             broadcast(new ChatQueueUpdated($this->getQueueData()));
             broadcast(new NewChatMessage($message, $session));
         } catch (\Exception $e) {
-            logger()->warning('Broadcast chat accept gagal: ' . $e->getMessage());
+            Log::warning('Broadcast chat accept gagal: ' . ($e->getMessage() ?? 'Unknown error'));
         }
 
         return response()->json([
@@ -106,7 +107,7 @@ class ChatController extends Controller
         try {
             broadcast(new NewChatMessage($message, $session));
         } catch (\Exception $e) {
-            logger()->warning('Broadcast chat message gagal: ' . $e->getMessage());
+            Log::warning('Broadcast chat message gagal: ' . ($e->getMessage() ?? 'Unknown error'));
         }
 
         return response()->json([
@@ -135,7 +136,7 @@ class ChatController extends Controller
         try {
             broadcast(new ChatQueueUpdated($this->getQueueData()));
         } catch (\Exception $e) {
-            logger()->warning('Broadcast chat close gagal: ' . $e->getMessage());
+            Log::warning('Broadcast chat close gagal: ' . ($e->getMessage() ?? 'Unknown error'));
         }
 
         return response()->json(['success' => true, 'message' => 'Sesi chat ditutup.']);

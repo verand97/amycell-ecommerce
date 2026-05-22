@@ -19,7 +19,7 @@ class CartController extends Controller
         return view('customer.cart.index', compact('cart', 'total'));
     }
 
-    public function add(Request $request, $productId)
+    public function add(Request $request, int $productId)
     {
         $product = Product::findOrFail($productId);
 

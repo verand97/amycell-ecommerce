@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TransactionController extends Controller
 {
@@ -59,7 +60,7 @@ class TransactionController extends Controller
             broadcast(new OrderStatusUpdated($order));
         } catch (\Exception $e) {
             // Log tapi jangan gagalkan response
-            logger()->warning('Broadcast OrderStatusUpdated gagal: ' . $e->getMessage());
+            Log::warning('Broadcast OrderStatusUpdated gagal: ' . ($e->getMessage() ?? 'Unknown error'));
         }
 
         return back()->with('success', "Transaksi #{$transaction->transaction_code} berhasil diverifikasi. Status pesanan diperbarui ke 'Dibayar'.");
@@ -94,7 +95,7 @@ class TransactionController extends Controller
         try {
             broadcast(new OrderStatusUpdated($order));
         } catch (\Exception $e) {
-            logger()->warning('Broadcast OrderStatusUpdated gagal: ' . $e->getMessage());
+            Log::warning('Broadcast OrderStatusUpdated gagal: ' . ($e->getMessage() ?? 'Unknown error'));
         }
 
         return back()->with('success', 'Transaksi ditolak. Customer diberitahu untuk mengirim ulang bukti bayar.');
@@ -121,7 +122,7 @@ class TransactionController extends Controller
         try {
             broadcast(new OrderStatusUpdated($order));
         } catch (\Exception $e) {
-            logger()->warning('Broadcast OrderStatusUpdated gagal: ' . $e->getMessage());
+            Log::warning('Broadcast OrderStatusUpdated gagal: ' . ($e->getMessage() ?? 'Unknown error'));
         }
 
         return back()->with('success', "Status pesanan diperbarui ke: {$order->fresh()->status_label}");
