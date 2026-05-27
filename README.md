@@ -1,58 +1,143 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📱 Amycell E-Commerce & HP Repair Service Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Amycell adalah platform e-commerce modern yang mengintegrasikan penjualan produk digital & fisik dengan sistem manajemen **Jasa Servis HP** (Smartphone Repair Service) secara terpadu, lengkap dengan dashboard admin yang komprehensif dan widget **Live Chat** real-time.
 
-## About Laravel
+Platform ini dibangun menggunakan framework **Laravel 13** dan sistem styling termodern **Tailwind CSS v4**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 🛒 1. E-Commerce (Belanja Online)
+- **Katalog Produk**: Tampilan produk fisik dan digital yang responsif dengan filter kategori dan pencarian.
+- **Keranjang Belanja (Shopping Cart)**: Manajemen kuantitas produk dinamis dan interaktif tanpa reload halaman.
+- **Checkout & Transaksi**: Alur pemesanan produk fisik dan digital, lengkap dengan pengiriman bukti transfer pembayaran.
 
-## Learning Laravel
+### 🔧 2. Jasa Servis HP (Smartphone Repair)
+- **Pengajuan Servis (Customer)**: Form pengajuan servis online dengan detail tipe HP, keluhan, estimasi kerusakan, dan upload foto perangkat.
+- **Timeline Pelacakan Real-Time**: Pelanggan dapat melacak status servis secara langsung (Pending -> Diterima -> Didiagnosa -> Dikerjakan -> Selesai -> Diambil/Dikirim).
+- **Admin Service Dashboard**:
+  - Konfirmasi penerimaan perangkat.
+  - Update status pengerjaan, estimasi biaya, dan catatan internal admin.
+  - Notifikasi progres pengerjaan servis.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 💬 3. Sistem Live Chat Real-Time
+- **Widget Chat Pelanggan**: Akses instan dari halaman customer untuk berkonsultasi langsung dengan admin.
+- **Admin Chat Panel**: Ruang obrolan khusus admin dengan sistem antrean sesi obrolan (waiting/active) berbasis Laravel Events & Broadcasting.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 📊 4. Panel Administrasi (Admin Dashboard)
+- **Dasbor Utama**: Statistik penjualan, total pendapatan, grafik transaksi, dan antrean servis/chat.
+- **Manajemen Produk**: CRUD produk fisik & digital (dengan upload file untuk produk digital).
+- **Manajemen Kategori**: Pengaturan kategori dinamis dengan emoji sebagai ikon.
+- **Verifikasi Transaksi**: Validasi bukti pembayaran bank transfer secara real-time untuk memproses pesanan otomatis.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## 🛠️ Tech Stack & Arsitektur
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- **Backend**: Laravel 13.x (PHP 8.2+)
+- **Database**: SQLite (default untuk efisiensi local development) atau MySQL/PostgreSQL
+- **Frontend**: HTML5, Blade Templates, JavaScript (Vanilla ES6)
+- **Styling**: Tailwind CSS v4 (Sistem utility-first modern berbasis CSS) & Custom Glassmorphism
+- **Asset Bundler**: Vite (Rolldown engine)
+- **Fonts**: Google Fonts (Inter / Outfit)
 
+---
+
+## 🚀 Panduan Instalasi Lokal
+
+Ikuti langkah-langkah di bawah ini untuk menjalankan proyek Amycell di lingkungan lokal Anda:
+
+### 1. Prasyarat (Prerequisites)
+Pastikan Anda sudah menginstal:
+- PHP >= 8.2 (dengan ekstensi `pdo_sqlite`, `sqlite3`, `mbstring`, `xml`, `openssl` aktif)
+- Composer (Dependency Manager untuk PHP)
+- Node.js & npm (untuk mengompilasi aset frontend)
+
+### 2. Kloning Repositori
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/verand97/amycell-ecommerce.git
+cd amycell-ecommerce
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 3. Instal Dependensi Backend & Frontend
+```bash
+# Instal dependensi PHP
+composer install
 
-## Contributing
+# Instal dependensi Node.js
+npm install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 4. Konfigurasi Lingkungan (`.env`)
+Salin file `.env.example` menjadi `.env`:
+```bash
+cp .env.example .env
+```
+Secara default, konfigurasi database menggunakan **SQLite**. Buat file database kosong:
+```bash
+# Di Windows (PowerShell)
+New-Item -ItemType File -Path database/database.sqlite -Force
 
-## Code of Conduct
+# Di Linux / macOS / Git Bash
+touch database/database.sqlite
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Lalu sesuaikan baris berikut di `.env` Anda jika perlu:
+```env
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+```
 
-## Security Vulnerabilities
+### 5. Generate Application Key & Jalankan Migrasi
+```bash
+# Generate key aplikasi
+php artisan key:generate
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Jalankan migrasi database beserta seeder awal
+php artisan migrate --seed
+```
 
-## License
+### 6. Jalankan Server Development
+Jalankan server backend Laravel:
+```bash
+php artisan serve
+```
+Dan jalankan dev server Vite untuk kompilasi aset CSS/JS real-time:
+```bash
+npm run dev
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Buka browser Anda dan akses `http://127.0.0.1:8000`.
+
+---
+
+## 📂 Struktur Direktori Penting
+
+```txt
+amycell-ecommerce/
+├── app/
+│   ├── Http/Controllers/
+│   │   ├── Admin/            # Controller panel manajemen admin (Produk, Servis, Transaksi)
+│   │   └── Customer/         # Controller sisi pelanggan (Katalog, Keranjang, Servis)
+│   └── Models/               # Model database Eloquent (Product, ServiceOrder, Transaction, ChatSession)
+├── database/
+│   ├── migrations/           # File migrasi database
+│   └── seeders/              # Data awal untuk pengujian
+├── resources/
+│   ├── css/
+│   │   └── app.css           # Konfigurasi Tailwind CSS v4 & custom animations
+│   ├── js/
+│   │   └── app.js            # Inisialisasi frontend JS
+│   └── views/                # Template Blade
+│       ├── admin/            # Tampilan panel admin
+│       ├── auth/             # Halaman Login, Register, dll.
+│       └── customer/         # Tampilan e-commerce dan pendaftaran servis
+└── routes/
+    └── web.php               # Routing utama web
+```
+
+---
+
+## 🛡️ Keamanan & Lisensi
+Proyek ini dibangun untuk tujuan e-commerce & portofolio perbaikan smartphone. Berlisensi di bawah [MIT License](LICENSE).
