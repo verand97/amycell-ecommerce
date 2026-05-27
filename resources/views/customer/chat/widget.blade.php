@@ -1,11 +1,11 @@
 {{-- Floating Live Chat Widget --}}
 @auth
 @if(auth()->user()->isCustomer())
-<div id="chat-widget" class="fixed bottom-6 right-6 z-[200]" data-user-id="{{ auth()->id() }}">
+<div id="chat-widget" class="fixed bottom-6 right-6 z-200" data-user-id="{{ auth()->id() }}">
 
     {{-- Toggle Button --}}
     <button id="chat-toggle"
-        class="w-14 h-14 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-full shadow-2xl shadow-sky-300 flex items-center justify-center text-white hover:scale-110 transition-transform relative">
+        class="w-14 h-14 bg-linear-to-br from-sky-500 to-indigo-600 rounded-full shadow-2xl shadow-sky-300 flex items-center justify-center text-white hover:scale-110 transition-transform relative">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 3v-3z"/>
         </svg>
@@ -16,7 +16,7 @@
     <div id="chat-window" class="absolute bottom-16 right-0 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col" style="display:none; height:480px;">
 
         {{-- Header --}}
-        <div class="bg-gradient-to-r from-sky-500 to-indigo-600 p-4 flex items-center justify-between shrink-0">
+        <div class="bg-linear-to-r from-sky-500 to-indigo-600 p-4 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 bg-white/20 rounded-full flex items-center justify-center">
                     <span class="text-white text-sm font-bold">AC</span>
@@ -55,7 +55,7 @@
         {{-- Start area --}}
         <div id="chat-start-area" class="p-4 border-t border-slate-100 bg-white shrink-0">
             <p class="text-xs text-slate-500 mb-3 text-center">Mulai sesi chat dengan tim kami</p>
-            <button id="start-chat-btn" class="w-full py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white text-sm font-bold rounded-xl hover:shadow-lg transition-all">
+            <button id="start-chat-btn" class="w-full py-2.5 bg-linear-to-r from-sky-500 to-indigo-600 text-white text-sm font-bold rounded-xl hover:shadow-lg transition-all">
                 💬 Mulai Chat
             </button>
         </div>

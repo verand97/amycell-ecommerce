@@ -36,7 +36,7 @@
 
             {{-- Payment Proof --}}
             @if($trx->proof_image_url)
-                <div class="flex-shrink-0">
+                <div class="shrink-0">
                     <a href="{{ $trx->proof_image_url }}" target="_blank">
                         <img src="{{ $trx->proof_image_url }}" class="w-20 h-20 object-cover rounded-xl border border-slate-700 hover:scale-105 transition-transform" alt="Bukti Bayar">
                     </a>
@@ -80,7 +80,7 @@
 
             {{-- Actions --}}
             @if($trx->status === 'pending')
-            <div class="flex flex-col gap-2 flex-shrink-0">
+            <div class="flex flex-col gap-2 shrink-0">
                 {{-- Verify --}}
                 <form action="{{ route('admin.transactions.verify', $trx->id) }}" method="POST">
                     @csrf
@@ -97,7 +97,7 @@
                 </button>
             </div>
             @elseif($trx->status === 'verified')
-            <div class="text-right flex-shrink-0">
+            <div class="text-right shrink-0">
                 <p class="text-xs text-emerald-400 font-semibold">✅ Terverifikasi</p>
                 <p class="text-[11px] text-slate-500 mt-1">oleh {{ $trx->verifiedBy?->name ?? '-' }}</p>
                 <p class="text-[11px] text-slate-600">{{ $trx->verified_at?->format('d M Y H:i') }}</p>
@@ -115,8 +115,7 @@
 
 {{ $transactions->links() }}
 
-{{-- Reject Modal --}}
-<div id="reject-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+<div id="reject-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md">
         <h3 class="font-bold text-white mb-4">❌ Tolak Transaksi</h3>
         <form id="reject-form" method="POST">
@@ -138,10 +137,14 @@
 <script>
 function showRejectModal(transactionId) {
     document.getElementById('reject-form').action = `/admin/transactions/${transactionId}/reject`;
-    document.getElementById('reject-modal').classList.remove('hidden');
+    const modal = document.getElementById('reject-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
 }
 function closeRejectModal() {
-    document.getElementById('reject-modal').classList.add('hidden');
+    const modal = document.getElementById('reject-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
 }
 </script>
 @endpush

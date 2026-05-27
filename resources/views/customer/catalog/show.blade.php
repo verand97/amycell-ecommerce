@@ -19,7 +19,7 @@
     <div class="grid lg:grid-cols-2 gap-8 mb-12">
 
         {{-- Product Image --}}
-        <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-3xl p-8 flex items-center justify-center min-h-[320px] relative">
+        <div class="bg-linear-to-br from-slate-50 to-slate-100 rounded-3xl p-8 flex items-center justify-center min-h-[320px] relative">
             @if($product->is_featured)
                 <div class="absolute top-4 left-4 bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">⭐ Unggulan</div>
             @endif
@@ -86,7 +86,7 @@
                                 class="w-14 text-center border-x border-slate-200 py-2.5 text-sm font-bold focus:outline-none">
                             <button type="button" onclick="incQty()" class="px-3 py-2.5 hover:bg-slate-100 text-slate-600 transition-colors">+</button>
                         </div>
-                        <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-sky-200 transition-all hover:-translate-y-0.5">
+                        <button type="submit" class="flex-1 py-3 bg-linear-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-sky-200 transition-all hover:-translate-y-0.5">
                             🛒 Tambah ke Keranjang
                         </button>
                     </form>
@@ -94,7 +94,7 @@
                     <div class="mt-6 py-3 bg-slate-100 text-slate-400 text-center rounded-xl font-semibold">Stok Habis</div>
                 @endif
             @else
-                <a href="{{ route('login') }}" class="mt-6 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-xl hover:shadow-lg transition-all">
+                <a href="{{ route('login') }}" class="mt-6 flex items-center justify-center gap-2 py-3 bg-linear-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-xl hover:shadow-lg transition-all">
                     🔐 Login untuk Membeli
                 </a>
             @endauth

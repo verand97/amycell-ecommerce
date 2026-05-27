@@ -6,7 +6,7 @@
 <div class="max-w-2xl mx-auto px-4 py-12 text-center">
 
     {{-- Success Icon --}}
-    <div class="w-24 h-24 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-200 animate-bounce">
+    <div class="w-24 h-24 bg-linear-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-emerald-200 animate-bounce">
         <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
         </svg>
@@ -81,7 +81,7 @@
 
     {{-- Actions --}}
     <div class="flex flex-col sm:flex-row gap-3 justify-center">
-        <a href="{{ route('customer.orders.show', $order->id) }}" class="px-6 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-2xl hover:shadow-lg transition-all">
+        <a href="{{ route('customer.orders.show', $order->id) }}" class="px-6 py-3 bg-linear-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-2xl hover:shadow-lg transition-all">
             Pantau Status Pesanan
         </a>
         <a href="{{ route('catalog') }}" class="px-6 py-3 bg-slate-100 text-slate-600 font-semibold rounded-2xl hover:bg-slate-200 transition-all">

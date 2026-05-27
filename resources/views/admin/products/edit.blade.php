@@ -87,7 +87,7 @@
         </div>
 
         <div class="flex gap-3 pt-2">
-            <button type="submit" class="px-6 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-xl hover:shadow-lg transition-all text-sm">Perbarui Produk</button>
+            <button type="submit" class="px-6 py-2.5 bg-linear-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-xl hover:shadow-lg transition-all text-sm">Perbarui Produk</button>
             <a href="{{ route('admin.products.index') }}" class="px-6 py-2.5 bg-slate-800 text-slate-300 font-semibold rounded-xl hover:bg-slate-700 transition-all text-sm">Batal</a>
         </div>
     </form>

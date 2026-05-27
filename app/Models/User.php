@@ -63,6 +63,11 @@ class User extends Authenticatable
         return $this->hasMany(ChatMessage::class, 'sender_id');
     }
 
+    public function serviceOrders()
+    {
+        return $this->hasMany(ServiceOrder::class);
+    }
+
     public function getAvatarUrlAttribute(): string
     {
         if ($this->avatar) {

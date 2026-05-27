@@ -36,7 +36,7 @@
                 <input type="checkbox" name="is_active" value="1" checked class="accent-sky-500">
                 <span class="text-xs text-slate-300">Aktif</span>
             </label>
-            <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-xl text-sm transition-all hover:shadow-lg">Tambah Kategori</button>
+            <button type="submit" class="w-full py-2.5 bg-linear-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-xl text-sm transition-all hover:shadow-lg">Tambah Kategori</button>
         </form>
     </div>
 
@@ -77,7 +77,7 @@
                         </td>
                         <td class="px-4 py-3.5 text-right">
                             <div class="flex items-center justify-end gap-2">
-                                <button onclick="editCategory({{ $cat->id }}, '{{ $cat->name }}', '{{ $cat->icon }}', '{{ $cat->description }}', {{ $cat->sort_order }}, {{ $cat->is_active ? 1 : 0 }})"
+                                <button data-id="{{ $cat->id }}" data-name="{{ $cat->name }}" data-icon="{{ $cat->icon }}" data-description="{{ $cat->description }}" data-order="{{ $cat->sort_order }}" data-active="{{ $cat->is_active ? 1 : 0 }}" onclick="editCategory(this)"
                                     class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg transition-colors">Edit</button>
                                 @if($cat->products_count == 0)
                                 <form action="{{ route('admin.categories.destroy', $cat->id) }}" method="POST" onsubmit="return confirm('Hapus kategori ini?')">
@@ -96,7 +96,7 @@
 </div>
 
 {{-- Edit Modal --}}
-<div id="edit-cat-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+<div id="edit-cat-modal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md">
         <h3 class="font-bold text-white mb-4">Edit Kategori</h3>
         <form id="edit-cat-form" method="POST" class="space-y-3">
@@ -108,7 +108,7 @@
             <label class="flex items-center gap-2"><input type="checkbox" name="is_active" id="edit-cat-active" value="1" class="accent-sky-500"><span class="text-sm text-slate-300">Aktif</span></label>
             <div class="flex gap-2">
                 <button type="submit" class="flex-1 py-2.5 bg-sky-500 text-white font-bold rounded-xl text-sm">Perbarui</button>
-                <button type="button" onclick="document.getElementById('edit-cat-modal').classList.add('hidden')" class="flex-1 py-2.5 bg-slate-800 text-slate-300 rounded-xl text-sm">Batal</button>
+                <button type="button" onclick="const modal = document.getElementById('edit-cat-modal'); modal.classList.add('hidden'); modal.classList.remove('flex');" class="flex-1 py-2.5 bg-slate-800 text-slate-300 rounded-xl text-sm">Batal</button>
             </div>
         </form>
     </div>
@@ -116,14 +116,24 @@
 
 @push('scripts')
 <script>
-function editCategory(id, name, icon, desc, order, active) {
+function editCategory(btn) {
+    const id = btn.getAttribute('data-id');
+    const name = btn.getAttribute('data-name');
+    const icon = btn.getAttribute('data-icon');
+    const desc = btn.getAttribute('data-description');
+    const order = btn.getAttribute('data-order');
+    const active = parseInt(btn.getAttribute('data-active'));
+
     document.getElementById('edit-cat-form').action = `/admin/categories/${id}`;
     document.getElementById('edit-cat-name').value = name;
     document.getElementById('edit-cat-icon').value = icon;
     document.getElementById('edit-cat-desc').value = desc;
     document.getElementById('edit-cat-order').value = order;
     document.getElementById('edit-cat-active').checked = active === 1;
-    document.getElementById('edit-cat-modal').classList.remove('hidden');
+    
+    const modal = document.getElementById('edit-cat-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
 }
 </script>
 @endpush

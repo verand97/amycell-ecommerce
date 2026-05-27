@@ -21,7 +21,7 @@
         <div class="flex items-center justify-between h-16">
             {{-- Logo --}}
             <a href="{{ route('home') }}" class="flex items-center gap-2 group">
-                <div class="w-9 h-9 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                <div class="w-9 h-9 bg-linear-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                     <span class="text-white font-bold text-sm">AC</span>
                 </div>
                 <div>
@@ -34,6 +34,7 @@
             <div class="hidden md:flex items-center gap-1">
                 <a href="{{ route('home') }}" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-sky-600 hover:bg-sky-50 transition-all {{ request()->routeIs('home') ? 'text-sky-600 bg-sky-50' : '' }}">Beranda</a>
                 <a href="{{ route('catalog') }}" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-sky-600 hover:bg-sky-50 transition-all {{ request()->routeIs('catalog*') ? 'text-sky-600 bg-sky-50' : '' }}">Katalog</a>
+                <a href="{{ route('service.landing') }}" class="px-4 py-2 rounded-lg text-sm font-medium text-slate-600 hover:text-orange-600 hover:bg-orange-50 transition-all {{ request()->routeIs('service.landing') || request()->routeIs('customer.service*') ? 'text-orange-600 bg-orange-50' : '' }}">🔧 Servis HP</a>
             </div>
 
             {{-- Right Actions --}}
@@ -63,6 +64,10 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                                 Pesanan Saya
                             </a>
+                            <a href="{{ route('customer.service') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-orange-600 transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                Servis Saya
+                            </a>
                             <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-600 transition-all">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                                 Profil
@@ -86,7 +91,7 @@
                     </div>
                 @else
                     <a href="{{ route('login') }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-sky-600 transition-all">Masuk</a>
-                    <a href="{{ route('register') }}" class="px-4 py-2 bg-gradient-to-r from-sky-500 to-indigo-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-sky-200 transition-all hover:-translate-y-0.5">Daftar</a>
+                    <a href="{{ route('register') }}" class="px-4 py-2 bg-linear-to-r from-sky-500 to-indigo-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-sky-200 transition-all hover:-translate-y-0.5">Daftar</a>
                 @endauth
             </div>
         </div>
@@ -95,10 +100,10 @@
 
 {{-- Flash Messages --}}
 @if(session('success') || session('error'))
-    <div id="flash-message" class="fixed top-20 right-4 z-[100] max-w-sm w-full animate-slide-in">
+    <div id="flash-message" class="fixed top-20 right-4 z-100 max-w-sm w-full animate-slide-in">
         @if(session('success'))
             <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-start gap-3 shadow-lg">
-                <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 </div>
                 <div>
@@ -110,7 +115,7 @@
         @endif
         @if(session('error'))
             <div class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-start gap-3 shadow-lg">
-                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </div>
                 <div>
@@ -135,7 +140,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div class="md:col-span-2">
                 <div class="flex items-center gap-2 mb-4">
-                    <div class="w-9 h-9 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                    <div class="w-9 h-9 bg-linear-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center">
                         <span class="text-white font-bold text-sm">AC</span>
                     </div>
                     <span class="font-bold text-white text-xl">Toko Amycell</span>
@@ -152,6 +157,7 @@
                     <li><a href="{{ route('catalog') }}?type=digital" class="text-slate-400 hover:text-sky-400 transition-colors">Produk Digital</a></li>
                     <li><a href="{{ route('catalog') }}?type=physical" class="text-slate-400 hover:text-sky-400 transition-colors">Produk Fisik</a></li>
                     <li><a href="{{ route('catalog') }}" class="text-slate-400 hover:text-sky-400 transition-colors">Semua Produk</a></li>
+                    <li><a href="{{ route('service.landing') }}" class="text-slate-400 hover:text-orange-400 transition-colors">🔧 Servis HP</a></li>
                 </ul>
             </div>
             <div>

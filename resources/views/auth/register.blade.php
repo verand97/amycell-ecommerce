@@ -14,7 +14,7 @@
 <div class="min-h-screen flex">
 
     {{-- Left Panel — Branding --}}
-    <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-slate-900 via-sky-950 to-indigo-950 flex-col justify-between p-12">
+    <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-linear-to-br from-slate-900 via-sky-950 to-indigo-950 flex-col justify-between p-12">
 
         {{-- Background decorations --}}
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
@@ -26,7 +26,7 @@
         {{-- Top Logo --}}
         <div class="relative z-10">
             <a href="{{ route('home') }}" class="flex items-center gap-3 group w-fit">
-                <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                <div class="w-10 h-10 bg-linear-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
                     <span class="text-white font-bold text-sm">AC</span>
                 </div>
                 <div>
@@ -41,7 +41,7 @@
             <div class="text-8xl mb-6">🎉</div>
             <h2 class="text-4xl font-black text-white leading-tight mb-4">
                 Bergabung dengan<br>
-                <span class="bg-gradient-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">Amycell!</span>
+                <span class="bg-linear-to-r from-sky-400 to-indigo-400 bg-clip-text text-transparent">Amycell!</span>
             </h2>
             <p class="text-slate-400 text-lg leading-relaxed max-w-sm mx-auto">
                 Daftar gratis dan nikmati kemudahan belanja pulsa, paket data, token listrik, dan ribuan produk digital lainnya.
@@ -76,7 +76,7 @@
             {{-- Mobile Logo --}}
             <div class="flex justify-center mb-8 lg:hidden">
                 <a href="{{ route('home') }}" class="flex items-center gap-2 group">
-                    <div class="w-10 h-10 bg-gradient-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <div class="w-10 h-10 bg-linear-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
                         <span class="text-white font-bold text-sm">AC</span>
                     </div>
                     <div>
@@ -254,7 +254,7 @@
                 {{-- Submit --}}
                 <button
                     type="submit"
-                    class="w-full py-3.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-2xl hover:shadow-xl hover:shadow-sky-200 transition-all hover:-translate-y-0.5 text-sm tracking-wide"
+                    class="w-full py-3.5 bg-linear-to-r from-sky-500 to-indigo-600 text-white font-bold rounded-2xl hover:shadow-xl hover:shadow-sky-200 transition-all hover:-translate-y-0.5 text-sm tracking-wide"
                 >
                     🎉 Buat Akun Sekarang
                 </button>

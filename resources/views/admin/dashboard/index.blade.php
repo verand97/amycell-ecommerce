@@ -118,6 +118,29 @@
                 @endif
             </div>
         </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-xl">🔧</div>
+                <div>
+                    <p class="text-xs text-slate-400">Servis HP</p>
+                    <p class="text-xl font-black text-white">{{ number_format($totalServices) }}</p>
+                </div>
+            </div>
+            <div class="mt-3 grid grid-cols-2 gap-1 text-center">
+                <div class="bg-yellow-500/10 rounded-lg p-2">
+                    <p class="text-sm font-bold text-yellow-400">{{ $pendingServices }}</p>
+                    <p class="text-[10px] text-slate-500">Pending</p>
+                </div>
+                <div class="bg-purple-500/10 rounded-lg p-2">
+                    <p class="text-sm font-bold text-purple-400">{{ $activeServices }}</p>
+                    <p class="text-[10px] text-slate-500">Aktif</p>
+                </div>
+            </div>
+            @if($pendingServices > 0)
+                <a href="{{ route('admin.services.index') }}?status=pending" class="mt-2 block text-center text-xs text-orange-400 hover:text-orange-300 transition-colors">Lihat Pending →</a>
+            @endif
+        </div>
     </div>
 </div>
 

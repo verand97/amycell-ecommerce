@@ -25,7 +25,7 @@
             <button type="submit" class="px-4 py-2 bg-sky-500 text-white rounded-xl text-sm font-semibold hover:bg-sky-600 transition-colors">Cari</button>
         </form>
     </div>
-    <a href="{{ route('admin.products.create') }}" class="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all">
+    <a href="{{ route('admin.products.create') }}" class="flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-sky-500 to-indigo-600 text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         Tambah Produk
     </a>

@@ -10,6 +10,9 @@ Route::get('/', [Customer\HomeController::class, 'index'])->name('home');
 Route::get('/catalog', [Customer\HomeController::class, 'catalog'])->name('catalog');
 Route::get('/catalog/{product:slug}', [Customer\HomeController::class, 'showProduct'])->name('catalog.show');
 
+// Service HP (public landing)
+Route::get('/service', [Customer\ServiceController::class, 'landing'])->name('service.landing');
+
 // Cart count (AJAX, no auth needed)
 Route::get('/cart/count', [Customer\CartController::class, 'count'])->name('cart.count');
 
@@ -46,6 +49,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/session/{session}/message', [Customer\ChatController::class, 'sendMessage'])->name('.send');
         Route::get('/session/{session}/messages', [Customer\ChatController::class, 'getMessages'])->name('.messages');
         Route::get('/session/{session}/status', [Customer\ChatController::class, 'getSessionStatus'])->name('.status');
+    });
+
+    // Service HP
+    Route::prefix('service')->name('customer.service')->group(function () {
+        Route::get('/my', [Customer\ServiceController::class, 'index'])->name('');
+        Route::get('/create', [Customer\ServiceController::class, 'create'])->name('.create');
+        Route::post('/', [Customer\ServiceController::class, 'store'])->name('.store');
+        Route::get('/{serviceOrder}', [Customer\ServiceController::class, 'show'])->name('.show');
+        Route::post('/{serviceOrder}/approve', [Customer\ServiceController::class, 'approve'])->name('.approve');
+        Route::post('/{serviceOrder}/cancel', [Customer\ServiceController::class, 'cancel'])->name('.cancel');
     });
 
     // Profile (Breeze)
@@ -92,6 +105,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         ->name('chat.close');
     Route::get('/chat/queue', [Admin\ChatController::class, 'getQueue'])
         ->name('chat.queue');
+
+    // Services (Servis HP)
+    Route::get('/services', [Admin\ServiceController::class, 'index'])->name('services.index');
+    Route::get('/services/{serviceOrder}', [Admin\ServiceController::class, 'show'])->name('services.show');
+    Route::post('/services/{serviceOrder}/update-status', [Admin\ServiceController::class, 'updateStatus'])
+        ->name('services.update-status');
 });
 
 require __DIR__.'/auth.php';

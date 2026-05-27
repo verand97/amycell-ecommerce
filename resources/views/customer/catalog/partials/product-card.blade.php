@@ -17,7 +17,7 @@ $discountPct = $product->discount_percentage;
     @endif
 
     {{-- Image --}}
-    <div class="aspect-square {{ $dark ? 'bg-slate-700' : 'bg-gradient-to-br from-slate-50 to-slate-100' }} flex items-center justify-center p-4 relative overflow-hidden">
+    <div class="aspect-square {{ $dark ? 'bg-slate-700' : 'bg-linear-to-br from-slate-50 to-slate-100' }} flex items-center justify-center p-4 relative overflow-hidden">
         @if($product->image)
             <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300">
         @else
@@ -56,7 +56,7 @@ $discountPct = $product->discount_percentage;
             <input type="hidden" name="quantity" value="1">
             <button type="submit"
                     class="w-full py-2 rounded-xl text-xs font-bold transition-all
-                           {{ !$product->isInStock() ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : ($dark ? 'bg-sky-500 hover:bg-sky-400 text-white hover:shadow-lg hover:shadow-sky-500/30' : 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-sky-200') }}"
+                           {{ !$product->isInStock() ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : ($dark ? 'bg-sky-500 hover:bg-sky-400 text-white hover:shadow-lg hover:shadow-sky-500/30' : 'bg-linear-to-r from-sky-500 to-indigo-600 text-white hover:shadow-lg hover:shadow-sky-200') }}"
                     {{ !$product->isInStock() ? 'disabled' : '' }}>
                 {{ $product->isInStock() ? '+ Keranjang' : 'Habis' }}
             </button>

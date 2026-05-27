@@ -10,7 +10,7 @@
         <div class="text-center py-20 bg-white rounded-3xl border border-slate-100">
             <div class="text-7xl mb-4">📭</div>
             <h2 class="text-xl font-bold text-slate-700">Belum ada pesanan</h2>
-            <a href="{{ route('catalog') }}" class="mt-4 inline-block px-8 py-3 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-2xl font-bold">Mulai Belanja</a>
+            <a href="{{ route('catalog') }}" class="mt-4 inline-block px-8 py-3 bg-linear-to-r from-sky-500 to-indigo-600 text-white rounded-2xl font-bold">Mulai Belanja</a>
         </div>
     @else
         <div class="space-y-4">

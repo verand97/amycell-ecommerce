@@ -66,7 +66,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-sky-500 to-indigo-600 text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all">Terapkan</button>
+                    <button type="submit" class="w-full py-2.5 bg-linear-to-r from-sky-500 to-indigo-600 text-white rounded-xl text-sm font-bold hover:shadow-lg transition-all">Terapkan</button>
                     @if(request()->anyFilled(['search', 'category', 'type', 'sort']))
                         <a href="{{ route('catalog') }}" class="block text-center text-xs text-red-500 hover:text-red-700 mt-2 transition-colors">✕ Hapus Filter</a>
                     @endif

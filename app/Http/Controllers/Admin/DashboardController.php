@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ServiceOrder;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -77,6 +78,11 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Service stats
+        $totalServices    = ServiceOrder::count();
+        $pendingServices  = ServiceOrder::where('status', 'pending')->count();
+        $activeServices   = ServiceOrder::active()->count();
+
         return view('admin.dashboard.index', compact(
             'totalRevenue',
             'monthlyRevenue',
@@ -92,7 +98,10 @@ class DashboardController extends Controller
             'totalCustomers',
             'pendingPayments',
             'recentOrders',
-            'topProducts'
+            'topProducts',
+            'totalServices',
+            'pendingServices',
+            'activeServices'
         ));
     }
 }
