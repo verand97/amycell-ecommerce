@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -32,15 +33,16 @@ class TransactionController extends Controller
     {
         $request->validate(['notes' => 'nullable|string|max:500']);
 
-        abort_if($transaction->status !== 'pending', 422);
+        abort_if($transaction->status === 'verified', 422);
 
         DB::beginTransaction();
         try {
             $transaction->update([
-                'status'      => 'verified',
-                'verified_by' => auth()->id(),
-                'verified_at' => now(),
-                'notes'       => $request->notes,
+                'status'           => 'verified',
+                'verified_by'      => Auth::id(),
+                'verified_at'      => now(),
+                'notes'            => $request->notes,
+                'rejection_reason' => null,
             ]);
 
             $order = $transaction->order;
@@ -72,13 +74,13 @@ class TransactionController extends Controller
             'rejection_reason' => 'required|string|max:500',
         ]);
 
-        abort_if($transaction->status !== 'pending', 422);
+        abort_if($transaction->status === 'rejected', 422);
 
         DB::beginTransaction();
         try {
             $transaction->update([
                 'status'           => 'rejected',
-                'verified_by'      => auth()->id(),
+                'verified_by'      => Auth::id(),
                 'verified_at'      => now(),
                 'rejection_reason' => $request->rejection_reason,
             ]);
@@ -104,7 +106,7 @@ class TransactionController extends Controller
     public function updateOrderStatus(Request $request, Order $order)
     {
         $request->validate([
-            'status'      => 'required|in:processing,shipped,completed,cancelled',
+            'status'      => 'required|in:awaiting_payment,payment_uploaded,paid,processing,shipped,completed,cancelled',
             'admin_notes' => 'nullable|string|max:500',
         ]);
 
@@ -115,6 +117,27 @@ class TransactionController extends Controller
 
         if ($request->status === 'shipped') $updates['shipped_at'] = now();
         if ($request->status === 'completed') $updates['completed_at'] = now();
+        if ($request->status === 'paid') {
+            $updates['paid_at'] = now();
+            if ($order->transaction && $order->transaction->status !== 'verified') {
+                $order->transaction->update([
+                    'status'           => 'verified',
+                    'verified_by'      => Auth::id(),
+                    'verified_at'      => now(),
+                    'rejection_reason' => null,
+                ]);
+            }
+        }
+        if ($request->status === 'awaiting_payment') {
+            if ($order->transaction && $order->transaction->status !== 'rejected') {
+                $order->transaction->update([
+                    'status'           => 'rejected',
+                    'verified_by'      => Auth::id(),
+                    'verified_at'      => now(),
+                    'rejection_reason' => $request->admin_notes ?? 'Mengubah status pesanan ke Menunggu Pembayaran',
+                ]);
+            }
+        }
 
         $order->update($updates);
 

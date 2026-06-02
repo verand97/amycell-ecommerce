@@ -64,7 +64,7 @@ class CheckoutController extends Controller
                 'shipping_address'     => $request->shipping_address ?? '-',
                 'shipping_city'        => $request->shipping_city ?? '-',
                 'shipping_postal_code' => $request->shipping_postal_code ?? '00000',
-                'payment_method'       => 'bank_transfer',
+                'payment_method'       => 'midtrans',
                 'notes'                => $request->notes,
             ]);
 
@@ -86,13 +86,52 @@ class CheckoutController extends Controller
                 }
             }
 
+            // Generate Midtrans Snap Token
+            try {
+                \Midtrans\Config::$serverKey = config('midtrans.server_key');
+                \Midtrans\Config::$isProduction = config('midtrans.is_production');
+                \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
+                \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+
+                $params = [
+                    'transaction_details' => [
+                        'order_id' => $order->order_number,
+                        'gross_amount' => (int) $order->total_amount,
+                    ],
+                    'customer_details' => [
+                        'first_name' => $order->user->name,
+                        'email' => $order->user->email,
+                        'phone' => $order->shipping_phone ?? $order->user->phone ?? '',
+                    ],
+                ];
+
+                $snapToken = \Midtrans\Snap::getSnapToken($params);
+                $order->update(['snap_token' => $snapToken]);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Midtrans Snap Token generation failed: ' . $e->getMessage());
+            }
+
             Session::forget('cart');
             DB::commit();
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'snap_token' => $order->snap_token,
+                    'redirect_url' => route('customer.checkout.success', $order->order_number),
+                ]);
+            }
 
             return redirect()->route('customer.checkout.success', $order->order_number)
                 ->with('success', 'Pesanan berhasil dibuat!');
         } catch (\Exception $e) {
             DB::rollBack();
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage(),
+                ], 500);
+            }
             return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
@@ -103,6 +142,32 @@ class CheckoutController extends Controller
             ->where('user_id', auth()->id())
             ->with('items')
             ->firstOrFail();
+
+        if (empty($order->snap_token) && $order->status === 'awaiting_payment') {
+            try {
+                \Midtrans\Config::$serverKey = config('midtrans.server_key');
+                \Midtrans\Config::$isProduction = config('midtrans.is_production');
+                \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
+                \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+
+                $params = [
+                    'transaction_details' => [
+                        'order_id' => $order->order_number,
+                        'gross_amount' => (int) $order->total_amount,
+                    ],
+                    'customer_details' => [
+                        'first_name' => $order->user->name,
+                        'email' => $order->user->email,
+                        'phone' => $order->shipping_phone ?? $order->user->phone ?? '',
+                    ],
+                ];
+
+                $snapToken = \Midtrans\Snap::getSnapToken($params);
+                $order->update(['snap_token' => $snapToken]);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Midtrans Snap Token regeneration failed: ' . $e->getMessage());
+            }
+        }
 
         return view('customer.checkout.success', compact('order'));
     }

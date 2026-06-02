@@ -79,30 +79,48 @@
             </div>
 
             {{-- Actions --}}
-            @if($trx->status === 'pending')
-            <div class="flex flex-col gap-2 shrink-0">
-                {{-- Verify --}}
-                <form action="{{ route('admin.transactions.verify', $trx->id) }}" method="POST">
-                    @csrf
-                    <button type="submit" onclick="return confirm('Verifikasi transaksi ini? Status pesanan akan otomatis diperbarui ke DIBAYAR.')"
-                        class="w-full px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-all hover:shadow-lg">
-                        ✅ Verifikasi
-                    </button>
-                </form>
+            <div class="flex flex-col gap-2 shrink-0 justify-center">
+                @if($trx->status === 'pending')
+                    {{-- Verify --}}
+                    <form action="{{ route('admin.transactions.verify', $trx->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" onclick="return confirm('Verifikasi transaksi ini? Status pesanan akan otomatis diperbarui ke DIBAYAR.')"
+                            class="w-full px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-all hover:shadow-lg cursor-pointer">
+                            ✅ Verifikasi
+                        </button>
+                    </form>
 
-                {{-- Reject --}}
-                <button onclick="showRejectModal('{{ $trx->id }}')"
-                    class="w-full px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold rounded-xl border border-red-500/20 transition-all">
-                    ❌ Tolak
-                </button>
+                    {{-- Reject --}}
+                    <button onclick="showRejectModal('{{ $trx->id }}')"
+                        class="w-full px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold rounded-xl border border-red-500/20 transition-all cursor-pointer">
+                        ❌ Tolak
+                    </button>
+                @elseif($trx->status === 'verified')
+                    <div class="text-right">
+                        <p class="text-xs text-emerald-400 font-semibold">✅ Terverifikasi</p>
+                        <p class="text-[11px] text-slate-500 mt-1">oleh {{ $trx->verifiedBy?->name ?? '-' }}</p>
+                        <p class="text-[11px] text-slate-600 mb-2">{{ $trx->verified_at?->format('d M Y H:i') }}</p>
+                        <button onclick="showRejectModal('{{ $trx->id }}')"
+                            class="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-[10px] font-bold rounded-lg border border-red-500/20 transition-all cursor-pointer">
+                            ❌ Batalkan & Tolak
+                        </button>
+                    </div>
+                @elseif($trx->status === 'rejected')
+                    <div class="text-right">
+                        <p class="text-xs text-red-400 font-semibold">❌ Ditolak</p>
+                        @if($trx->rejection_reason)
+                            <p class="text-[10px] text-slate-400 max-w-[200px] truncate mb-2 mt-1" title="{{ $trx->rejection_reason }}">Alasan: {{ $trx->rejection_reason }}</p>
+                        @endif
+                        <form action="{{ route('admin.transactions.verify', $trx->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" onclick="return confirm('Verifikasi ulang transaksi ini? Status pesanan akan diperbarui ke DIBAYAR.')"
+                                class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold rounded-lg transition-colors cursor-pointer">
+                                ✅ Verifikasi Ulang
+                            </button>
+                        </form>
+                    </div>
+                @endif
             </div>
-            @elseif($trx->status === 'verified')
-            <div class="text-right shrink-0">
-                <p class="text-xs text-emerald-400 font-semibold">✅ Terverifikasi</p>
-                <p class="text-[11px] text-slate-500 mt-1">oleh {{ $trx->verifiedBy?->name ?? '-' }}</p>
-                <p class="text-[11px] text-slate-600">{{ $trx->verified_at?->format('d M Y H:i') }}</p>
-            </div>
-            @endif
         </div>
     </div>
     @empty

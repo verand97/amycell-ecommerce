@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Customer;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\MidtransWebhookController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Public Routes ───────────────────────────────────────────────────────────
@@ -15,6 +16,9 @@ Route::get('/service', [Customer\ServiceController::class, 'landing'])->name('se
 
 // Cart count (AJAX, no auth needed)
 Route::get('/cart/count', [Customer\CartController::class, 'count'])->name('cart.count');
+
+// Midtrans Webhook Notification
+Route::post('/midtrans/webhook', [MidtransWebhookController::class, 'handle'])->name('midtrans.webhook');
 
 // ─── Customer Auth Routes ─────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified'])->group(function () {

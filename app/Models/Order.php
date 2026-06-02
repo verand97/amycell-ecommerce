@@ -28,6 +28,7 @@ class Order extends Model
         'paid_at',
         'shipped_at',
         'completed_at',
+        'snap_token',
     ];
 
     protected $casts = [

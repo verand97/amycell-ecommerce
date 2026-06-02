@@ -181,8 +181,19 @@
                             <p class="text-xs font-bold text-sky-400">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</p>
                             <p class="text-[10px] text-slate-500">{{ $order->created_at->diffForHumans() }}</p>
                         </td>
-                        <td class="px-5 py-3">
-                            <a href="{{ route('admin.orders.show', $order->id) }}" class="text-[10px] text-sky-400 hover:text-sky-300">Detail →</a>
+                        <td class="px-5 py-3 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('admin.orders.show', $order->id) }}" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] rounded-lg transition-colors font-medium">Detail →</a>
+                                @if($order->status === 'payment_uploaded' && $order->transaction && $order->transaction->status === 'pending')
+                                    <form action="{{ route('admin.transactions.verify', $order->transaction->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" onclick="return confirm('Verifikasi transaksi ini? Status pesanan akan otomatis diperbarui ke DIBAYAR.')"
+                                            class="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] font-bold rounded-lg transition-colors shadow-sm cursor-pointer">
+                                            ✅ Verifikasi
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                     @endforeach

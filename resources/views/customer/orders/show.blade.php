@@ -77,19 +77,24 @@
         </div>
     </div>
 
-    {{-- Upload Payment (if needed) --}}
+    {{-- Midtrans Snap Payment (if needed) --}}
     @if($order->status === 'awaiting_payment')
-        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-4">
-            <h3 class="font-bold text-amber-800 mb-3">📤 Upload Bukti Pembayaran</h3>
-            <form action="{{ route('customer.checkout.upload-payment', $order->id) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="grid sm:grid-cols-2 gap-3 mb-3">
-                    <input type="text" name="bank_name" placeholder="Nama Bank" required class="px-3 py-2 text-sm border border-amber-200 rounded-xl outline-none focus:ring-2 focus:ring-amber-400">
-                    <input type="text" name="account_name" placeholder="Nama Pengirim" required class="px-3 py-2 text-sm border border-amber-200 rounded-xl outline-none focus:ring-2 focus:ring-amber-400">
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 mb-4">
+            <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                💳 Selesaikan Pembayaran
+            </h3>
+            <p class="text-xs text-slate-500 mb-4">Silakan selesaikan pembayaran pesanan Anda secara aman via Midtrans menggunakan Virtual Account, QRIS, E-Wallet, atau Kartu Kredit.</p>
+
+            @if($order->snap_token)
+                <button id="pay-button" class="w-full py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl transition-colors text-sm cursor-pointer flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                    Bayar Sekarang
+                </button>
+            @else
+                <div class="p-3 bg-red-50 text-red-600 rounded-xl text-xs font-semibold text-center">
+                    Gagal memuat sesi pembayaran Midtrans. Silakan hubungi admin atau muat ulang halaman.
                 </div>
-                <input type="file" name="proof_image" accept="image/*" required class="w-full text-sm mb-3">
-                <button type="submit" class="w-full py-2.5 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-colors">Upload Bukti Bayar</button>
-            </form>
+            @endif
         </div>
     @endif
 
@@ -139,6 +144,32 @@
 </div>
 
 @push('scripts')
+@if($order->status === 'awaiting_payment' && $order->snap_token)
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const payButton = document.getElementById('pay-button');
+        if (payButton) {
+            payButton.addEventListener('click', function () {
+                window.snap.pay('{{ $order->snap_token }}', {
+                    onSuccess: function(result){
+                        window.location.reload();
+                    },
+                    onPending: function(result){
+                        window.location.reload();
+                    },
+                    onError: function(result){
+                        alert("Pembayaran gagal! Silakan coba lagi.");
+                    },
+                    onClose: function(){
+                        alert('Anda menutup popup pembayaran sebelum menyelesaikan transaksi.');
+                    }
+                });
+            });
+        }
+    });
+</script>
+@endif
 <script>
 // Real-time status tracking via Reverb
 const orderContainer = document.getElementById('order-details-container');

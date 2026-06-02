@@ -5,38 +5,31 @@
 @section('content')
 
 {{-- Hero Section --}}
-<section class="relative overflow-hidden bg-linear-to-br from-slate-900 via-orange-950 to-red-950 text-white min-h-[80vh] flex items-center">
-    {{-- Background decorations --}}
-    <div class="absolute inset-0 overflow-hidden">
-        <div class="absolute top-20 left-10 w-72 h-72 bg-orange-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div class="absolute bottom-20 right-10 w-96 h-96 bg-red-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-orange-400/5 rounded-full blur-3xl"></div>
-    </div>
-
+<section class="relative overflow-hidden bg-[#FAF6F2] text-slate-800 min-h-[75vh] flex items-center border-b border-sky-100/50">
     <div class="relative max-w-7xl mx-auto px-4 py-20 text-center">
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-orange-500/20 border border-orange-400/30 rounded-full text-orange-300 text-sm font-medium mb-6 backdrop-blur-sm">
-            <span class="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></span>
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-sky-100 border border-sky-200 rounded-full text-sky-800 text-sm font-semibold mb-6">
+            <span class="w-2 h-2 bg-sky-500 rounded-full animate-pulse"></span>
             Teknisi Berpengalaman • Garansi Servis • Harga Transparan
         </div>
 
-        <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-6">
+        <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight mb-6 text-sky-900">
             Jasa Servis
-            <span class="bg-linear-to-r from-orange-400 to-red-400 bg-clip-text text-transparent block">Smartphone</span>
+            <span class="text-sky-500 block">Smartphone</span>
         </h1>
-        <p class="text-slate-300 text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+        <p class="text-slate-600 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
             HP rusak? Tenang, Amycell siap membantu! Layanan perbaikan profesional untuk semua merk smartphone dengan garansi dan harga terjangkau.
         </p>
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
             @auth
-                <a href="{{ route('customer.service.create') }}" class="px-8 py-4 bg-linear-to-r from-orange-500 to-red-600 rounded-2xl text-white font-bold text-lg hover:shadow-2xl hover:shadow-orange-500/30 transition-all hover:-translate-y-1 hover:scale-105">
+                <a href="{{ route('customer.service.create') }}" class="px-8 py-4 bg-sky-500 text-white font-bold text-lg rounded-xl hover:bg-sky-600 hover:shadow-lg transition-all">
                     🔧 Ajukan Servis Sekarang
                 </a>
-                <a href="{{ route('customer.service') }}" class="px-8 py-4 bg-white/10 border border-white/20 rounded-2xl text-white font-semibold text-lg hover:bg-white/20 transition-all backdrop-blur-sm">
+                <a href="{{ route('customer.service') }}" class="px-8 py-4 bg-white border border-sky-200 text-sky-900 font-semibold text-lg rounded-xl hover:bg-sky-50 transition-all">
                     📋 Servis Saya
                 </a>
             @else
-                <a href="{{ route('login') }}" class="px-8 py-4 bg-linear-to-r from-orange-500 to-red-600 rounded-2xl text-white font-bold text-lg hover:shadow-2xl hover:shadow-orange-500/30 transition-all hover:-translate-y-1 hover:scale-105">
+                <a href="{{ route('login') }}" class="px-8 py-4 bg-sky-500 text-white font-bold text-lg rounded-xl hover:bg-sky-600 hover:shadow-lg transition-all">
                     🔧 Ajukan Servis Sekarang
                 </a>
             @endauth
@@ -44,17 +37,17 @@
 
         {{-- Stats --}}
         <div class="grid grid-cols-3 gap-4 max-w-lg mx-auto">
-            <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4">
-                <p class="text-2xl font-black text-orange-400">500+</p>
-                <p class="text-slate-400 text-xs mt-1">HP Diperbaiki</p>
+            <div class="bg-white border border-sky-100 rounded-2xl p-4 shadow-xs">
+                <p class="text-2xl font-black text-sky-500">500+</p>
+                <p class="text-slate-500 text-xs mt-1 font-medium">HP Diperbaiki</p>
             </div>
-            <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4">
-                <p class="text-2xl font-black text-red-400">98%</p>
-                <p class="text-slate-400 text-xs mt-1">Puas</p>
+            <div class="bg-white border border-sky-100 rounded-2xl p-4 shadow-xs">
+                <p class="text-2xl font-black text-indigo-600">98%</p>
+                <p class="text-slate-500 text-xs mt-1 font-medium">Puas</p>
             </div>
-            <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4">
-                <p class="text-2xl font-black text-amber-400">1-3</p>
-                <p class="text-slate-400 text-xs mt-1">Hari Kerja</p>
+            <div class="bg-white border border-sky-100 rounded-2xl p-4 shadow-xs">
+                <p class="text-2xl font-black text-emerald-600">1-3</p>
+                <p class="text-slate-500 text-xs mt-1 font-medium">Hari Kerja</p>
             </div>
         </div>
     </div>
@@ -81,7 +74,7 @@
         @endphp
 
         @foreach($services as $svc)
-        <div class="group p-6 bg-white rounded-2xl border border-slate-100 hover:border-{{ $svc['color'] }}-200 hover:shadow-xl hover:shadow-{{ $svc['color'] }}-100/50 transition-all hover:-translate-y-1">
+        <div class="group p-6 bg-white rounded-2xl border border-slate-100 hover:border-sky-300 hover:shadow-xl hover:shadow-sky-500/5 transition-all hover:-translate-y-1">
             <div class="text-4xl mb-3 group-hover:scale-110 transition-transform">{{ $svc['icon'] }}</div>
             <h3 class="font-bold text-slate-800 text-sm mb-1">{{ $svc['title'] }}</h3>
             <p class="text-slate-500 text-xs leading-relaxed">{{ $svc['desc'] }}</p>
@@ -91,31 +84,31 @@
 </section>
 
 {{-- How It Works --}}
-<section class="bg-linear-to-br from-slate-800 to-slate-900 py-16">
+<section class="bg-sky-900 py-16 border-t border-sky-950">
     <div class="max-w-7xl mx-auto px-4">
         <div class="text-center mb-12">
             <h2 class="text-3xl font-black text-white">Cara Kerja</h2>
-            <p class="text-slate-400 mt-2">4 langkah mudah untuk memperbaiki HP kamu</p>
+            <p class="text-sky-100/60 mt-2">4 langkah mudah untuk memperbaiki HP kamu</p>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @php
                 $steps = [
-                    ['num' => '01', 'icon' => '📝', 'title' => 'Ajukan Servis', 'desc' => 'Isi form permintaan servis dengan detail kerusakan HP kamu', 'color' => 'from-orange-500 to-amber-500'],
-                    ['num' => '02', 'icon' => '🔍', 'title' => 'Diagnosa', 'desc' => 'Teknisi kami akan memeriksa dan memberikan estimasi biaya', 'color' => 'from-sky-500 to-blue-500'],
-                    ['num' => '03', 'icon' => '🔧', 'title' => 'Perbaikan', 'desc' => 'Setelah kamu setuju, proses perbaikan segera dilakukan', 'color' => 'from-purple-500 to-indigo-500'],
-                    ['num' => '04', 'icon' => '✅', 'title' => 'Selesai', 'desc' => 'HP kamu sudah seperti baru! Ambil dan nikmati garansinya', 'color' => 'from-emerald-500 to-teal-500'],
+                    ['num' => '01', 'icon' => '📝', 'title' => 'Ajukan Servis', 'desc' => 'Isi form permintaan servis dengan detail kerusakan HP kamu'],
+                    ['num' => '02', 'icon' => '🔍', 'title' => 'Diagnosa', 'desc' => 'Teknisi kami akan memeriksa dan memberikan estimasi biaya'],
+                    ['num' => '03', 'icon' => '🔧', 'title' => 'Perbaikan', 'desc' => 'Setelah kamu setuju, proses perbaikan segera dilakukan'],
+                    ['num' => '04', 'icon' => '✅', 'title' => 'Selesai', 'desc' => 'HP kamu sudah seperti baru! Ambil dan nikmati garansinya'],
                 ];
             @endphp
 
             @foreach($steps as $step)
             <div class="relative group">
-                <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 hover:border-slate-600 transition-all hover:-translate-y-1">
-                    <div class="w-12 h-12 bg-linear-to-br {{ $step['color'] }} rounded-xl flex items-center justify-center text-2xl mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                <div class="bg-sky-950/40 border border-sky-850 rounded-2xl p-6 hover:border-sky-500 transition-all hover:-translate-y-1">
+                    <div class="w-12 h-12 bg-sky-500 rounded-xl flex items-center justify-center text-2xl mb-4 shadow-md group-hover:scale-110 transition-transform">
                         {{ $step['icon'] }}
                     </div>
-                    <span class="text-xs font-bold text-slate-600 tracking-widest">STEP {{ $step['num'] }}</span>
+                    <span class="text-xs font-bold text-sky-100/40 tracking-widest">STEP {{ $step['num'] }}</span>
                     <h3 class="font-bold text-white text-lg mt-1 mb-2">{{ $step['title'] }}</h3>
-                    <p class="text-slate-400 text-sm leading-relaxed">{{ $step['desc'] }}</p>
+                    <p class="text-sky-100/60 text-sm leading-relaxed">{{ $step['desc'] }}</p>
                 </div>
             </div>
             @endforeach
@@ -125,17 +118,16 @@
 
 {{-- CTA --}}
 <section class="max-w-7xl mx-auto px-4 py-16">
-    <div class="bg-linear-to-r from-orange-500 to-red-600 rounded-3xl p-8 md:p-12 text-center text-white relative overflow-hidden">
-        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iMS41IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiLz48L3N2Zz4=')] opacity-50"></div>
+    <div class="bg-sky-900 rounded-3xl p-8 md:p-12 text-center border border-sky-850 relative overflow-hidden">
         <div class="relative">
-            <h2 class="text-3xl md:text-4xl font-black mb-4">HP Bermasalah? Servis Sekarang!</h2>
-            <p class="text-orange-100 text-lg mb-8 max-w-xl mx-auto">Jangan biarkan HP rusak menghambat aktivitasmu. Dapatkan perbaikan cepat, berkualitas, dan bergaransi.</p>
+            <h2 class="text-3xl md:text-4xl font-black mb-4 text-white">HP Bermasalah? Servis Sekarang!</h2>
+            <p class="text-sky-100/70 text-lg mb-8 max-w-xl mx-auto">Jangan biarkan HP rusak menghambat aktivitasmu. Dapatkan perbaikan cepat, berkualitas, dan bergaransi.</p>
             @auth
-                <a href="{{ route('customer.service.create') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-white text-orange-600 font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-white/20 transition-all hover:-translate-y-1 hover:scale-105">
+                <a href="{{ route('customer.service.create') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-sky-500 text-white font-bold text-lg rounded-xl hover:bg-sky-600 hover:shadow-lg transition-all">
                     🔧 Ajukan Servis
                 </a>
             @else
-                <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-white text-orange-600 font-bold text-lg rounded-2xl hover:shadow-2xl hover:shadow-white/20 transition-all hover:-translate-y-1 hover:scale-105">
+                <a href="{{ route('login') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-sky-500 text-white font-bold text-lg rounded-xl hover:bg-sky-600 hover:shadow-lg transition-all">
                     🔧 Login & Ajukan Servis
                 </a>
             @endauth

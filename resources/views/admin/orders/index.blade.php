@@ -57,15 +57,18 @@
                     <p class="text-sm font-bold text-sky-400">Rp {{ number_format($order->total_amount, 0, ',', '.') }}</p>
                 </td>
                 <td class="px-4 py-3.5">
-                    <span class="px-2.5 py-1 text-[10px] font-bold rounded-full
-                        @if(in_array($order->status_color, ['yellow'])) bg-yellow-500/20 text-yellow-400
-                        @elseif($order->status_color === 'blue') bg-blue-500/20 text-blue-400
-                        @elseif($order->status_color === 'green') bg-emerald-500/20 text-emerald-400
-                        @elseif($order->status_color === 'red') bg-red-500/20 text-red-400
-                        @elseif($order->status_color === 'indigo') bg-indigo-500/20 text-indigo-400
-                        @elseif($order->status_color === 'purple') bg-purple-500/20 text-purple-400
-                        @else bg-slate-700 text-slate-300
-                        @endif">
+                    @php
+                        $statusClass = match($order->status_color) {
+                            'yellow' => 'bg-yellow-500/20 text-yellow-400',
+                            'blue' => 'bg-blue-500/20 text-blue-400',
+                            'green' => 'bg-emerald-500/20 text-emerald-400',
+                            'red' => 'bg-red-500/20 text-red-400',
+                            'indigo' => 'bg-indigo-500/20 text-indigo-400',
+                            'purple' => 'bg-purple-500/20 text-purple-400',
+                            default => 'bg-slate-700 text-slate-300',
+                        };
+                    @endphp
+                    <span class="px-2.5 py-1 text-[10px] font-bold rounded-full {{ $statusClass }}">
                         {{ $order->status_label }}
                     </span>
                 </td>

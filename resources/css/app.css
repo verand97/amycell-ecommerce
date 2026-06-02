@@ -1,9 +1,54 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 
+@theme {
+  --color-primary: #ec6426;
+  --color-secondary: #f8a91f;
+  --color-accent: #fde3cf;
+  --color-dark: #632713;
+
+  /* Override standard scales to map existing layouts dynamically */
+  --color-sky-50: #fde3cf;
+  --color-sky-100: #ffd8bd;
+  --color-sky-200: #fbb082;
+  --color-sky-300: #f99054;
+  --color-sky-400: #f87834;
+  --color-sky-500: #ec6426;
+  --color-sky-600: #d64f14;
+  --color-sky-700: #b23c0b;
+  --color-sky-800: #8d2e07;
+  --color-sky-900: #632713;
+  --color-sky-950: #3c1407;
+
+  --color-indigo-50: #fff9f5;
+  --color-indigo-100: #fde3cf;
+  --color-indigo-200: #fcd4b8;
+  --color-indigo-300: #f8a91f;
+  --color-indigo-400: #e38a0f;
+  --color-indigo-500: #b56a05;
+  --color-indigo-600: #632713;
+  --color-indigo-700: #491a0c;
+  --color-indigo-800: #371207;
+  --color-indigo-900: #260902;
+  --color-indigo-950: #130300;
+
+  --color-orange-50: #fde3cf;
+  --color-orange-100: #ffd8bd;
+  --color-orange-200: #fbb082;
+  --color-orange-300: #f99054;
+  --color-orange-400: #f87834;
+  --color-orange-500: #ec6426;
+  --color-orange-600: #d64f14;
+  --color-orange-700: #b23c0b;
+  --color-orange-800: #8d2e07;
+  --color-orange-900: #632713;
+  --color-orange-950: #3c1407;
+  
+  --color-amber-400: #f8a91f;
+  --color-amber-500: #ec6426;
+}
+
 /* ── Amycell Custom Styles ─────────────────────────────────────── */
-
-
 
 /* Animations */
 @keyframes slide-in {
@@ -28,11 +73,11 @@
 /* Scrollbar */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #475569; }
+::-webkit-scrollbar-thumb { background: #632713; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #ec6426; }
 
 /* Selection */
-::selection { background-color: #0ea5e9; color: white; }
+::selection { background-color: #ec6426; color: white; }
 
 /* Line clamp */
 .line-clamp-2 {
@@ -77,18 +122,18 @@ nav[aria-label="Pagination Navigation"] a {
 
 /* Customer pagination (light) */
 nav[aria-label="Pagination Navigation"] a {
-  color: #475569;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  color: #632713;
+  background: #fdfdfc;
+  border: 1px solid #fde3cf;
 }
 nav[aria-label="Pagination Navigation"] a:hover {
-  background: #0ea5e9;
+  background: #ec6426;
   color: white;
-  border-color: #0ea5e9;
+  border-color: #ec6426;
 }
 nav[aria-label="Pagination Navigation"] span[aria-current="page"] > span {
-  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  background: linear-gradient(135deg, #ec6426, #632713);
   color: white;
   border-color: transparent;
-  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+  box-shadow: 0 4px 14px rgba(236, 100, 38, 0.3);
 }

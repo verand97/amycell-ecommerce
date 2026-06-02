@@ -14,15 +14,18 @@
                     <p class="font-mono text-lg font-black text-white">{{ $order->order_number }}</p>
                     <p class="text-xs text-slate-400">{{ $order->created_at->format('d F Y, H:i') }}</p>
                 </div>
-                <span class="px-4 py-1.5 text-sm font-bold rounded-full
-                    @if($order->status_color === 'yellow') bg-yellow-500/20 text-yellow-400
-                    @elseif($order->status_color === 'blue') bg-blue-500/20 text-blue-400
-                    @elseif($order->status_color === 'green') bg-emerald-500/20 text-emerald-400
-                    @elseif($order->status_color === 'red') bg-red-500/20 text-red-400
-                    @elseif($order->status_color === 'indigo') bg-indigo-500/20 text-indigo-400
-                    @elseif($order->status_color === 'purple') bg-purple-500/20 text-purple-400
-                    @else bg-slate-700 text-slate-300
-                    @endif">
+                @php
+                    $statusClass = match($order->status_color) {
+                        'yellow' => 'bg-yellow-500/20 text-yellow-400',
+                        'blue' => 'bg-blue-500/20 text-blue-400',
+                        'green' => 'bg-emerald-500/20 text-emerald-400',
+                        'red' => 'bg-red-500/20 text-red-400',
+                        'indigo' => 'bg-indigo-500/20 text-indigo-400',
+                        'purple' => 'bg-purple-500/20 text-purple-400',
+                        default => 'bg-slate-700 text-slate-300',
+                    };
+                @endphp
+                <span class="px-4 py-1.5 text-sm font-bold rounded-full {{ $statusClass }}">
                     {{ $order->status_label }}
                 </span>
             </div>
@@ -50,24 +53,68 @@
             </div>
         </div>
 
-        {{-- Payment Proof --}}
-        @if($order->payment_proof_url)
+        {{-- Payment Info --}}
+        @if($order->payment_proof_url || $order->transaction)
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-            <h3 class="font-bold text-white mb-3">Bukti Pembayaran</h3>
-            <a href="{{ $order->payment_proof_url }}" target="_blank">
-                <img src="{{ $order->payment_proof_url }}" class="max-h-48 rounded-xl mx-auto object-contain hover:scale-105 transition-transform" alt="Bukti Bayar">
-            </a>
+            <h3 class="font-bold text-white mb-4 flex items-center gap-2">
+                💳 Detail Pembayaran
+            </h3>
+
+            @if($order->payment_proof_url)
+                <div class="mb-4">
+                    <p class="text-xs text-slate-400 mb-2">Bukti Pembayaran (Manual Transfer):</p>
+                    <a href="{{ $order->payment_proof_url }}" target="_blank">
+                        <img src="{{ $order->payment_proof_url }}" class="max-h-48 rounded-xl mx-auto object-contain hover:scale-105 transition-transform" alt="Bukti Bayar">
+                    </a>
+                </div>
+            @endif
+
             @if($order->transaction)
-                <div class="mt-3 flex items-center justify-between">
-                    <span class="text-xs px-3 py-1.5 rounded-full font-bold {{ $order->transaction->status === 'verified' ? 'bg-emerald-500/20 text-emerald-400' : ($order->transaction->status === 'rejected' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400') }}">
-                        {{ $order->transaction->status_label }}
-                    </span>
-                    @if($order->transaction->status === 'pending')
-                        <div class="flex gap-2">
-                            <form action="{{ route('admin.transactions.verify', $order->transaction->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="px-4 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-colors">✅ Verifikasi</button>
-                            </form>
+                <div class="pt-3 {{ $order->payment_proof_url ? 'border-t border-slate-800' : '' }} space-y-3.5 text-xs">
+                    <div class="flex justify-between border-b border-slate-800/50 pb-2">
+                        <span class="text-slate-500">Kode Transaksi:</span>
+                        <span class="font-mono text-slate-200 font-semibold">{{ $order->transaction->transaction_code }}</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-800/50 pb-2">
+                        <span class="text-slate-500">Tipe Pembayaran:</span>
+                        <span class="text-slate-200 font-semibold uppercase">{{ str_replace('_', ' ', $order->transaction->payment_type) }}</span>
+                    </div>
+                    @if($order->transaction->bank_name)
+                    <div class="flex justify-between border-b border-slate-800/50 pb-2">
+                        <span class="text-slate-500">Bank Pengirim:</span>
+                        <span class="text-slate-200 font-semibold uppercase">{{ $order->transaction->bank_name }}</span>
+                    </div>
+                    @endif
+                    <div class="flex justify-between">
+                        <span class="text-slate-500">Status Pembayaran:</span>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold {{ $order->transaction->status === 'verified' ? 'bg-emerald-500/20 text-emerald-400' : ($order->transaction->status === 'rejected' ? 'bg-red-500/20 text-red-400' : 'bg-amber-500/20 text-amber-400') }}">
+                            {{ $order->transaction->status_label }}
+                        </span>
+                    </div>
+
+                    @if($order->transaction->rejection_reason)
+                        <p class="text-xs text-red-400 mb-3 bg-red-500/10 p-2.5 rounded-xl border border-red-500/20">
+                            <strong>Alasan Penolakan:</strong> {{ $order->transaction->rejection_reason }}
+                        </p>
+                    @endif
+
+                    {{-- Actions for manual payments verification only --}}
+                    @if($order->payment_proof_url)
+                        <div class="flex gap-2 justify-end pt-2">
+                            @if($order->transaction->status !== 'verified')
+                                <form action="{{ route('admin.transactions.verify', $order->transaction->id) }}" method="POST" class="inline">
+                                    @csrf
+                                    <button type="submit" class="px-3.5 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer">
+                                        {{ $order->transaction->status === 'rejected' ? '✅ Verifikasi Ulang' : '✅ Verifikasi' }}
+                                    </button>
+                                </form>
+                            @endif
+
+                            @if($order->transaction->status !== 'rejected')
+                                <button type="button" onclick="showRejectModal('{{ $order->transaction->id }}')" class="px-3.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold rounded-xl border border-red-500/20 transition-colors cursor-pointer">
+                                    {{ $order->transaction->status === 'verified' ? '❌ Batalkan & Tolak' : '❌ Tolak' }}
+                                </button>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -128,4 +175,38 @@
         @endif
     </div>
 </div>
+
+<div id="reject-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-md">
+        <h3 class="font-bold text-white mb-4">❌ Tolak Transaksi</h3>
+        <form id="reject-form" method="POST">
+            @csrf
+            <div class="mb-4">
+                <label class="block text-xs font-semibold text-slate-400 mb-2">Alasan Penolakan *</label>
+                <textarea name="rejection_reason" rows="3" required placeholder="Jelaskan alasan penolakan..."
+                    class="w-full px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm text-slate-200 focus:ring-2 focus:ring-red-500 outline-none resize-none"></textarea>
+            </div>
+            <div class="flex gap-3">
+                <button type="submit" class="flex-1 py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl text-sm transition-colors">Tolak Transaksi</button>
+                <button type="button" onclick="closeRejectModal()" class="flex-1 py-2.5 bg-slate-800 text-slate-300 rounded-xl text-sm hover:bg-slate-700 transition-colors">Batal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+function showRejectModal(transactionId) {
+    document.getElementById('reject-form').action = `/admin/transactions/${transactionId}/reject`;
+    const modal = document.getElementById('reject-modal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+function closeRejectModal() {
+    const modal = document.getElementById('reject-modal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+</script>
+@endpush
 @endsection

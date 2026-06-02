@@ -21,7 +21,7 @@
         <div class="flex items-center justify-between h-16">
             {{-- Logo --}}
             <a href="{{ route('home') }}" class="flex items-center gap-2 group">
-                <div class="w-9 h-9 bg-linear-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform">
+                <div class="w-9 h-9 bg-sky-500 rounded-xl flex items-center justify-center shadow-md shadow-sky-500/10 group-hover:scale-105 transition-transform">
                     <span class="text-white font-bold text-sm">AC</span>
                 </div>
                 <div>
@@ -91,7 +91,7 @@
                     </div>
                 @else
                     <a href="{{ route('login') }}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-sky-600 transition-all">Masuk</a>
-                    <a href="{{ route('register') }}" class="px-4 py-2 bg-linear-to-r from-sky-500 to-indigo-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-sky-200 transition-all hover:-translate-y-0.5">Daftar</a>
+                    <a href="{{ route('register') }}" class="px-4 py-2 bg-sky-500 text-white text-sm font-semibold rounded-xl hover:bg-sky-600 hover:shadow-md transition-all">Daftar</a>
                 @endauth
             </div>
         </div>
@@ -135,43 +135,43 @@
 </main>
 
 {{-- Footer --}}
-<footer class="bg-slate-900 text-slate-300 mt-16">
+<footer class="bg-sky-900 text-sky-100/80 mt-16 border-t border-sky-850">
     <div class="max-w-7xl mx-auto px-4 py-12">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div class="md:col-span-2">
                 <div class="flex items-center gap-2 mb-4">
-                    <div class="w-9 h-9 bg-linear-to-br from-sky-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                    <div class="w-9 h-9 bg-sky-500 rounded-xl flex items-center justify-center">
                         <span class="text-white font-bold text-sm">AC</span>
                     </div>
                     <span class="font-bold text-white text-xl">Toko Amycell</span>
                 </div>
-                <p class="text-slate-400 text-sm leading-relaxed">Platform digital terpercaya untuk kebutuhan pulsa, paket data, token listrik, dan aksesori smartphone Anda. Proses cepat, harga terbaik, layanan 24/7.</p>
+                <p class="text-sky-100/60 text-sm leading-relaxed">Platform digital terpercaya untuk kebutuhan pulsa, paket data, token listrik, dan aksesori smartphone Anda. Proses cepat, harga terbaik, layanan 24/7.</p>
                 <div class="flex items-center gap-2 mt-4">
                     <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
-                    <span class="text-xs text-slate-400">Layanan aktif 24 jam</span>
+                    <span class="text-xs text-sky-100/60">Layanan aktif 24 jam</span>
                 </div>
             </div>
             <div>
                 <h4 class="text-white font-semibold mb-4">Layanan</h4>
                 <ul class="space-y-2 text-sm">
-                    <li><a href="{{ route('catalog') }}?type=digital" class="text-slate-400 hover:text-sky-400 transition-colors">Produk Digital</a></li>
-                    <li><a href="{{ route('catalog') }}?type=physical" class="text-slate-400 hover:text-sky-400 transition-colors">Produk Fisik</a></li>
-                    <li><a href="{{ route('catalog') }}" class="text-slate-400 hover:text-sky-400 transition-colors">Semua Produk</a></li>
-                    <li><a href="{{ route('service.landing') }}" class="text-slate-400 hover:text-orange-400 transition-colors">🔧 Servis HP</a></li>
+                    <li><a href="{{ route('catalog') }}?type=digital" class="text-sky-100/60 hover:text-sky-400 transition-colors">Produk Digital</a></li>
+                    <li><a href="{{ route('catalog') }}?type=physical" class="text-sky-100/60 hover:text-sky-400 transition-colors">Produk Fisik</a></li>
+                    <li><a href="{{ route('catalog') }}" class="text-sky-100/60 hover:text-sky-400 transition-colors">Semua Produk</a></li>
+                    <li><a href="{{ route('service.landing') }}" class="text-sky-100/60 hover:text-orange-400 transition-colors">🔧 Servis HP</a></li>
                 </ul>
             </div>
             <div>
                 <h4 class="text-white font-semibold mb-4">Informasi</h4>
                 <ul class="space-y-2 text-sm">
-                    <li><span class="text-slate-400">📱 081234567890</span></li>
-                    <li><span class="text-slate-400">📧 cs@amycell.id</span></li>
-                    <li><span class="text-slate-400">📍 Jakarta, Indonesia</span></li>
+                    <li><span class="text-sky-100/60">📱 081234567890</span></li>
+                    <li><span class="text-sky-100/60">📧 cs@amycell.id</span></li>
+                    <li><span class="text-sky-100/60">📍 Jakarta, Indonesia</span></li>
                 </ul>
             </div>
         </div>
-        <div class="border-t border-slate-800 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-slate-500 text-sm">© {{ date('Y') }} Toko Amycell. Hak Cipta Dilindungi.</p>
-            <div class="flex items-center gap-4 text-sm text-slate-500">
+        <div class="border-t border-sky-850 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-sky-100/40 text-sm">© {{ date('Y') }} Toko Amycell. Hak Cipta Dilindungi.</p>
+            <div class="flex items-center gap-4 text-sm text-sky-100/40">
                 <span>BCA • Mandiri • BNI • GoPay</span>
             </div>
         </div>
