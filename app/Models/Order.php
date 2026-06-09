@@ -99,4 +99,103 @@ class Order extends Model
         }
         return null;
     }
+
+    public function syncWithMidtrans(): bool
+    {
+        if ($this->payment_method !== 'midtrans' || in_array($this->status, ['paid', 'processing', 'shipped', 'completed', 'cancelled', 'refunded'])) {
+            return false;
+        }
+
+        try {
+            \Midtrans\Config::$serverKey = config('midtrans.server_key');
+            \Midtrans\Config::$isProduction = config('midtrans.is_production');
+            \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
+            \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+
+            // Fetch transaction status from Midtrans API
+            $status = \Midtrans\Transaction::status($this->order_number);
+            if (!$status) {
+                return false;
+            }
+
+            /** @var object $statusObj */
+            $statusObj = (object) $status;
+
+            // Convert raw object fields if they are inside StdClass
+            $transactionStatus = $statusObj->transaction_status ?? null;
+            $paymentType = $statusObj->payment_type ?? null;
+            $transactionId = $statusObj->transaction_id ?? null;
+
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            $transaction = $this->transaction()->first();
+            $trxData = [
+                'order_id'         => $this->id,
+                'transaction_code' => $transactionId ?? ($transaction?->transaction_code ?? Transaction::generateCode()),
+                'amount'           => $this->total_amount,
+                'payment_method'   => 'midtrans',
+                'bank_name'        => $paymentType,
+                'account_name'     => $this->user->name,
+                'status'           => 'pending',
+            ];
+
+            if (isset($statusObj->va_numbers[0]) && is_object($statusObj->va_numbers[0])) {
+                $firstVa = $statusObj->va_numbers[0];
+                if (isset($firstVa->bank)) {
+                    $trxData['bank_name'] = strtoupper($firstVa->bank);
+                }
+            }
+
+            if (!$transaction) {
+                $transaction = \App\Models\Transaction::create($trxData);
+            } else {
+                $transaction->update($trxData);
+            }
+
+            $updated = false;
+
+            if ($transactionStatus == 'capture') {
+                $fraudStatus = $statusObj->fraud_status ?? null;
+                if ($fraudStatus == 'challenge') {
+                    $this->update(['status' => 'payment_uploaded']);
+                    $transaction->update(['status' => 'pending']);
+                    $updated = true;
+                } else if ($fraudStatus == 'accept' || is_null($fraudStatus)) {
+                    $this->update(['status' => 'paid', 'paid_at' => now()]);
+                    $transaction->update(['status' => 'verified', 'verified_at' => now()]);
+                    $updated = true;
+                }
+            } else if ($transactionStatus == 'settlement') {
+                $this->update(['status' => 'paid', 'paid_at' => now()]);
+                $transaction->update(['status' => 'verified', 'verified_at' => now()]);
+                $updated = true;
+            } else if ($transactionStatus == 'pending') {
+                $this->update(['status' => 'payment_uploaded']);
+                $transaction->update(['status' => 'pending']);
+                $updated = true;
+            } else if (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
+                $this->update(['status' => 'cancelled']);
+                $transaction->update([
+                    'status' => 'rejected',
+                    'rejection_reason' => 'Pembayaran ' . $transactionStatus . ' via Midtrans'
+                ]);
+                $updated = true;
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            if ($updated) {
+                try {
+                    broadcast(new \App\Events\OrderStatusUpdated($this));
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::warning('Broadcast OrderStatusUpdated gagal: ' . $e->getMessage());
+                }
+            }
+
+            return $updated;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Midtrans sync failed for order ' . $this->order_number . ': ' . $e->getMessage());
+            return false;
+        }
+    }
 }

@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
 
 class CheckoutController extends Controller
 {
@@ -54,7 +55,7 @@ class CheckoutController extends Controller
 
             $order = Order::create([
                 'order_number'         => Order::generateOrderNumber(),
-                'user_id'              => auth()->id(),
+                'user_id'              => Auth::id(),
                 'subtotal'             => $subtotal,
                 'shipping_cost'        => $shippingCost,
                 'total_amount'         => $total,
@@ -103,6 +104,11 @@ class CheckoutController extends Controller
                         'email' => $order->user->email,
                         'phone' => $order->shipping_phone ?? $order->user->phone ?? '',
                     ],
+                    'callbacks' => [
+                        'finish' => route('customer.orders.show', $order->id),
+                        'unfinish' => route('customer.orders.show', $order->id),
+                        'error' => route('customer.orders.show', $order->id),
+                    ],
                 ];
 
                 $snapToken = \Midtrans\Snap::getSnapToken($params);
@@ -139,7 +145,7 @@ class CheckoutController extends Controller
     public function success(string $orderNumber)
     {
         $order = Order::where('order_number', $orderNumber)
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->with('items')
             ->firstOrFail();
 
@@ -160,6 +166,11 @@ class CheckoutController extends Controller
                         'email' => $order->user->email,
                         'phone' => $order->shipping_phone ?? $order->user->phone ?? '',
                     ],
+                    'callbacks' => [
+                        'finish' => route('customer.orders.show', $order->id),
+                        'unfinish' => route('customer.orders.show', $order->id),
+                        'error' => route('customer.orders.show', $order->id),
+                    ],
                 ];
 
                 $snapToken = \Midtrans\Snap::getSnapToken($params);
@@ -174,7 +185,7 @@ class CheckoutController extends Controller
 
     public function uploadPayment(Request $request, Order $order)
     {
-        abort_if($order->user_id !== auth()->id(), 403);
+        abort_if($order->user_id !== Auth::id(), 403);
 
         $request->validate([
             'proof_image' => 'required|image|mimes:jpg,jpeg,png|max:5120',

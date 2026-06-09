@@ -10,6 +10,7 @@ use App\Models\ChatMessage;
 use App\Models\ChatSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
@@ -50,7 +51,7 @@ class ChatController extends Controller
         abort_if($session->status !== 'waiting', 422);
 
         $session->update([
-            'admin_id'    => auth()->id(),
+            'admin_id'    => Auth::id(),
             'status'      => 'active',
             'accepted_at' => now(),
         ]);
@@ -58,9 +59,9 @@ class ChatController extends Controller
         // Send system welcome message
         $message = ChatMessage::create([
             'session_id'  => $session->id,
-            'sender_id'   => auth()->id(),
+            'sender_id'   => Auth::id(),
             'sender_type' => 'admin',
-            'message'     => 'Halo! Saya ' . auth()->user()->name . ' dari Tim Amycell. Ada yang bisa saya bantu?',
+            'message'     => 'Halo! Saya ' . Auth::user()->name . ' dari Tim Amycell. Ada yang bisa saya bantu?',
         ]);
         $message->load('sender');
 
@@ -81,7 +82,7 @@ class ChatController extends Controller
     public function sendMessage(Request $request, ChatSession $session)
     {
         abort_if($session->status !== 'active', 422);
-        abort_if($session->admin_id !== auth()->id(), 403);
+        abort_if($session->admin_id !== Auth::id(), 403);
 
         $request->validate([
             'message'    => 'required|string|max:1000',
@@ -95,7 +96,7 @@ class ChatController extends Controller
 
         $message = ChatMessage::create([
             'session_id'  => $session->id,
-            'sender_id'   => auth()->id(),
+            'sender_id'   => Auth::id(),
             'sender_type' => 'admin',
             'message'     => $request->message,
             'attachment'  => $attachmentPath,

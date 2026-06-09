@@ -35,6 +35,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
+        $order->syncWithMidtrans();
         $order->load(['user', 'items.product', 'transaction.verifiedBy']);
         return view('admin.orders.show', compact('order'));
     }

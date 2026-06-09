@@ -5,13 +5,14 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
         /** @var \App\Models\User|null $user */
-        $user = auth()->user();
+        $user = Auth::user();
 
         if (!$user instanceof \App\Models\User || !$user->isAdmin()) {
             if ($request->expectsJson()) {

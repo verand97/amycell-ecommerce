@@ -9,6 +9,7 @@ use App\Models\ChatMessage;
 use App\Models\ChatSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
@@ -19,7 +20,7 @@ class ChatController extends Controller
         ]);
 
         // Check if customer already has active/waiting session
-        $existing = ChatSession::where('customer_id', auth()->id())
+        $existing = ChatSession::where('customer_id', Auth::id())
             ->whereIn('status', ['waiting', 'active'])
             ->first();
 
@@ -33,7 +34,7 @@ class ChatController extends Controller
         }
 
         $session = ChatSession::create([
-            'customer_id'    => auth()->id(),
+            'customer_id'    => Auth::id(),
             'subject'        => $request->subject ?? 'Pertanyaan Umum',
             'status'         => 'waiting',
             'queue_position' => ChatSession::where('status', 'waiting')->count() + 1,
@@ -56,7 +57,7 @@ class ChatController extends Controller
 
     public function sendMessage(Request $request, ChatSession $session)
     {
-        abort_if($session->customer_id !== auth()->id(), 403);
+        abort_if($session->customer_id !== Auth::id(), 403);
         abort_if($session->status === 'closed', 422);
 
         $request->validate([
@@ -71,7 +72,7 @@ class ChatController extends Controller
 
         $message = ChatMessage::create([
             'session_id'  => $session->id,
-            'sender_id'   => auth()->id(),
+            'sender_id'   => Auth::id(),
             'sender_type' => 'customer',
             'message'     => $request->message,
             'attachment'  => $attachmentPath,
@@ -95,7 +96,7 @@ class ChatController extends Controller
 
     public function getMessages(ChatSession $session)
     {
-        abort_if($session->customer_id !== auth()->id(), 403);
+        abort_if($session->customer_id !== Auth::id(), 403);
 
         $messages = $session->messages()->with('sender')->get();
         // Mark admin messages as read
@@ -107,7 +108,7 @@ class ChatController extends Controller
 
     public function getSessionStatus(ChatSession $session)
     {
-        abort_if($session->customer_id !== auth()->id(), 403);
+        abort_if($session->customer_id !== Auth::id(), 403);
 
         return response()->json([
             'status'         => $session->status,

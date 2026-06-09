@@ -44,7 +44,7 @@
                     <p class="text-xs text-slate-500 truncate">{{ $session->subject }}</p>
                     <p class="text-[10px] text-amber-400 mt-0.5">Menunggu {{ $session->waiting_time }}</p>
                 </div>
-                <button onclick="acceptSession({{ $session->id }}, '{{ addslashes($session->customer->name) }}')"
+                <button onclick="acceptSession(this.dataset.id, this.dataset.name)" data-id="{{ $session->id }}" data-name="{{ $session->customer->name }}"
                     class="shrink-0 px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-xl transition-all hover:shadow-lg hover:shadow-sky-500/20">
                     Terima Chat
                 </button>
@@ -70,7 +70,7 @@
             {{-- Sessions List --}}
             <div id="sessions-list" class="w-52 border-r border-slate-800 shrink-0 overflow-y-auto">
                 @forelse($activeSessions as $session)
-                <button onclick="loadChat({{ $session->id }}, '{{ addslashes($session->customer->name) }}')"
+                <button onclick="loadChat(this.dataset.id, this.dataset.name)" data-id="{{ $session->id }}" data-name="{{ $session->customer->name }}"
                     id="session-btn-{{ $session->id }}"
                     class="w-full px-4 py-3 text-left hover:bg-slate-800 transition-colors border-b border-slate-800/50 active-session-btn">
                     <div class="flex items-center gap-2.5">
@@ -154,6 +154,7 @@ function showToast(msg, type = 'info') {
 // ─── Accept Session ──────────────────────────────────────────────────────────
 
 async function acceptSession(sessionId, customerName) {
+    sessionId = Number(sessionId);
     const btn = document.querySelector(`#queue-item-${sessionId} button`);
     if (btn) { btn.disabled = true; btn.textContent = 'Menerima...'; }
 
@@ -233,6 +234,7 @@ function addSessionToList(sessionId, customerName) {
 // ─── Load Chat ───────────────────────────────────────────────────────────────
 
 async function loadChat(sessionId, customerName) {
+    sessionId = Number(sessionId);
     activeSessionId = sessionId;
 
     // UI switch
@@ -457,7 +459,7 @@ function rebuildWaitingQueue(queue) {
                     <p class="text-xs text-slate-500 truncate">${safe(item.subject ?? 'Bantuan Umum')}</p>
                     <p class="text-[10px] text-amber-400 mt-0.5">Menunggu ${safe(item.waiting_time)}</p>
                 </div>
-                <button onclick="acceptSession(${item.id}, '${safe(item.customer_name)}')"
+                <button onclick="acceptSession(this.dataset.id, this.dataset.name)" data-id="${item.id}" data-name="${safe(item.customer_name)}"
                     class="shrink-0 px-4 py-2 bg-sky-500 hover:bg-sky-600 text-white text-xs font-bold rounded-xl transition-all">
                     Terima Chat
                 </button>`;
