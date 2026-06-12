@@ -69,6 +69,8 @@ class ServiceController extends Controller
             'diagnosis_notes'      => 'nullable|string|max:2000',
             'admin_notes'          => 'nullable|string|max:2000',
             'estimated_completion' => 'nullable|date',
+            'payment_status'       => 'nullable|string|in:unpaid,pending,paid',
+            'payment_method'       => 'nullable|string|in:cash,transfer,midtrans',
         ]);
 
         $data = [
@@ -90,6 +92,17 @@ class ServiceController extends Controller
         if ($request->filled('estimated_completion')) {
             $data['estimated_completion'] = $request->estimated_completion;
         }
+        if ($request->filled('payment_status')) {
+            $data['payment_status'] = $request->payment_status;
+            if ($request->payment_status === 'paid') {
+                $data['paid_at'] = now();
+            } else {
+                $data['paid_at'] = null;
+            }
+        }
+        if ($request->filled('payment_method')) {
+            $data['payment_method'] = $request->payment_method;
+        }
 
         // Set completed_at when status is completed
         if ($request->status === 'completed' && $serviceOrder->status !== 'completed') {
@@ -99,5 +112,20 @@ class ServiceController extends Controller
         $serviceOrder->update($data);
 
         return back()->with('success', 'Status servis berhasil diperbarui.');
+    }
+
+    /**
+     * Verify manual transfer payment.
+     */
+    public function verifyPayment(ServiceOrder $serviceOrder)
+    {
+        abort_if($serviceOrder->payment_status !== 'pending', 400);
+
+        $serviceOrder->update([
+            'payment_status' => 'paid',
+            'paid_at'        => now(),
+        ]);
+
+        return back()->with('success', 'Pembayaran transfer manual berhasil diverifikasi.');
     }
 }

@@ -66,6 +66,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{serviceOrder}', [Customer\ServiceController::class, 'show'])->name('.show');
         Route::post('/{serviceOrder}/approve', [Customer\ServiceController::class, 'approve'])->name('.approve');
         Route::post('/{serviceOrder}/cancel', [Customer\ServiceController::class, 'cancel'])->name('.cancel');
+        Route::post('/{serviceOrder}/pay-cash', [Customer\ServiceController::class, 'payCash'])->name('.pay-cash');
+        Route::post('/{serviceOrder}/pay-transfer', [Customer\ServiceController::class, 'payTransfer'])->name('.pay-transfer');
+        Route::post('/{serviceOrder}/pay-midtrans', [Customer\ServiceController::class, 'payMidtrans'])->name('.pay-midtrans');
     });
 
     // Profile (Breeze)
@@ -123,6 +126,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/services/{serviceOrder}', [Admin\ServiceController::class, 'show'])->name('services.show');
     Route::post('/services/{serviceOrder}/update-status', [Admin\ServiceController::class, 'updateStatus'])
         ->name('services.update-status');
+    Route::post('/services/{serviceOrder}/verify-payment', [Admin\ServiceController::class, 'verifyPayment'])
+        ->name('services.verify-payment');
 });
 
 require __DIR__.'/auth.php';

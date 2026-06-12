@@ -106,6 +106,107 @@
         </div>
     @endif
 
+    {{-- Payment Section --}}
+    @if($serviceOrder->status === 'completed' || $serviceOrder->status === 'picked_up')
+        <div class="bg-white rounded-2xl border border-slate-100 p-6 mb-6 shadow-sm">
+            <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">💳 Pembayaran Layanan</h3>
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 p-4 bg-slate-50 rounded-xl mb-6">
+                <div>
+                    <p class="text-xs text-slate-500">Biaya Final Perbaikan</p>
+                    <p class="text-2xl font-black text-slate-800">Rp {{ number_format($serviceOrder->final_cost ?? $serviceOrder->estimated_cost ?? 0, 0, ',', '.') }}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-slate-600">Status:</span>
+                    @if($serviceOrder->payment_status === 'paid')
+                        <span class="px-3 py-1.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl">✅ Lunas ({{ $serviceOrder->payment_method_label }})</span>
+                    @elseif($serviceOrder->payment_status === 'pending')
+                        <span class="px-3 py-1.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-xl">⏳ Menunggu Verifikasi ({{ $serviceOrder->payment_method_label }})</span>
+                    @else
+                        <span class="px-3 py-1.5 bg-red-100 text-red-700 text-xs font-bold rounded-xl">❌ Belum Dibayar</span>
+                    @endif
+                </div>
+            </div>
+
+            @if($serviceOrder->payment_status !== 'paid')
+                <div>
+                    <p class="text-sm font-bold text-slate-700 mb-3">Pilih Metode Pembayaran:</p>
+                    
+                    <div class="grid md:grid-cols-3 gap-4">
+                        {{-- Cash Method --}}
+                        <div class="border border-slate-200 rounded-xl p-5 flex flex-col justify-between hover:border-orange-500 transition-all hover:shadow-md hover:shadow-slate-100 {{ $serviceOrder->payment_method === 'cash' ? 'ring-2 ring-orange-500 bg-orange-50/5' : '' }}">
+                            <div>
+                                <h4 class="font-bold text-slate-800 flex items-center gap-1.5 text-sm">💵 Tunai (Cash)</h4>
+                                <p class="text-xs text-slate-500 mt-2 leading-relaxed">Bayar langsung di toko Amycell saat mengambil HP Anda.</p>
+                            </div>
+                            <form method="POST" action="{{ route('customer.service.pay-cash', $serviceOrder->id) }}" class="mt-5">
+                                @csrf
+                                <button type="submit" class="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition-all">
+                                    Pilih Tunai
+                                </button>
+                            </form>
+                        </div>
+
+                        {{-- Manual Bank Transfer Method --}}
+                        <div class="border border-slate-200 rounded-xl p-5 flex flex-col justify-between hover:border-orange-500 transition-all hover:shadow-md hover:shadow-slate-100 {{ $serviceOrder->payment_method === 'transfer' ? 'ring-2 ring-orange-500 bg-orange-50/5' : '' }}">
+                            <div>
+                                <h4 class="font-bold text-slate-800 flex items-center gap-1.5 text-sm">🏦 Transfer Bank</h4>
+                                <p class="text-xs text-slate-500 mt-2 leading-relaxed">Transfer BCA: <b>123-456-7890</b> a.n. Amycell.</p>
+                            </div>
+                            
+                            @if($serviceOrder->payment_method === 'transfer' && $serviceOrder->payment_proof)
+                                <div class="mt-3 text-center bg-slate-50 rounded-lg py-1.5 border border-slate-100">
+                                    <span class="text-[10px] text-slate-500 block">Bukti transfer terunggah</span>
+                                    <a href="{{ $serviceOrder->payment_proof_url }}" target="_blank" class="text-xs text-orange-600 hover:underline font-bold">Lihat Bukti</a>
+                                </div>
+                            @endif
+
+                            <button onclick="document.getElementById('modal-transfer').classList.remove('hidden'); document.getElementById('modal-transfer').classList.add('flex')" class="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold rounded-xl transition-all mt-5">
+                                {{ $serviceOrder->payment_proof ? 'Upload Ulang Bukti' : 'Upload Bukti Transfer' }}
+                            </button>
+                        </div>
+
+                        {{-- Midtrans Online Method --}}
+                        <div class="border border-slate-200 rounded-xl p-5 flex flex-col justify-between hover:border-orange-500 transition-all hover:shadow-md hover:shadow-slate-100 {{ $serviceOrder->payment_method === 'midtrans' ? 'ring-2 ring-orange-500 bg-orange-50/5' : '' }}">
+                            <div>
+                                <h4 class="font-bold text-slate-800 flex items-center gap-1.5 text-sm">⚡ Online (Midtrans)</h4>
+                                <p class="text-xs text-slate-500 mt-2 leading-relaxed">Bayar secara instan menggunakan E-Wallet, QRIS, Virtual Account, dll.</p>
+                            </div>
+                            <button id="btn-pay-midtrans" class="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-xl transition-all mt-5 hover:shadow-lg hover:shadow-orange-500/20">
+                                Bayar Online (Midtrans)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        </div>
+    @endif
+
+    {{-- Transfer Modal --}}
+    @if($serviceOrder->status === 'completed' && $serviceOrder->payment_status !== 'paid')
+        <div id="modal-transfer" class="fixed inset-0 z-50 items-center justify-center bg-black/60 hidden transition-all duration-300">
+            <div class="bg-white rounded-2xl max-w-md w-full p-6 mx-4 shadow-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-bold text-slate-800">Upload Bukti Transfer</h4>
+                    <button onclick="document.getElementById('modal-transfer').classList.add('hidden'); document.getElementById('modal-transfer').classList.remove('flex')" class="text-slate-400 hover:text-slate-600 transition-colors">✕</button>
+                </div>
+                <p class="text-xs text-slate-500 mb-4 leading-relaxed">Silakan transfer sebesar <b class="text-slate-800 text-sm">Rp {{ number_format($serviceOrder->final_cost ?? $serviceOrder->estimated_cost ?? 0, 0, ',', '.') }}</b> ke:<br>
+                Bank BCA: <b class="text-slate-800">123-456-7890</b> a.n. <b class="text-slate-800">Amycell</b></p>
+                <form method="POST" action="{{ route('customer.service.pay-transfer', $serviceOrder->id) }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="mb-4">
+                        <label class="block text-xs font-bold text-slate-700 mb-2">Pilih File Gambar Bukti Transfer</label>
+                        <input type="file" name="payment_proof" accept="image/*" required class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100 border border-slate-200 rounded-xl p-2 focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div class="flex gap-2 justify-end">
+                        <button type="button" onclick="document.getElementById('modal-transfer').classList.add('hidden'); document.getElementById('modal-transfer').classList.remove('flex')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-xl transition-all">Kirim Bukti</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
     <div class="grid lg:grid-cols-2 gap-6">
         {{-- Device Info --}}
         <div class="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
@@ -170,3 +271,62 @@
 
 </section>
 @endsection
+
+@push('scripts')
+@if($serviceOrder->status === 'completed' && $serviceOrder->payment_status !== 'paid')
+<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.client_key') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const btnPayMidtrans = document.getElementById('btn-pay-midtrans');
+        if (btnPayMidtrans) {
+            btnPayMidtrans.addEventListener('click', function () {
+                btnPayMidtrans.disabled = true;
+                btnPayMidtrans.textContent = 'Memproses...';
+
+                fetch("{{ route('customer.service.pay-midtrans', $serviceOrder->id) }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.snap_token) {
+                        window.snap.pay(data.snap_token, {
+                            onSuccess: function(result){
+                                window.location.reload();
+                            },
+                            onPending: function(result){
+                                window.location.reload();
+                            },
+                            onError: function(result){
+                                alert("Pembayaran gagal! Silakan coba lagi.");
+                                btnPayMidtrans.disabled = false;
+                                btnPayMidtrans.textContent = 'Bayar Online (Midtrans)';
+                            },
+                            onClose: function(){
+                                alert('Anda menutup popup pembayaran sebelum menyelesaikan transaksi.');
+                                btnPayMidtrans.disabled = false;
+                                btnPayMidtrans.textContent = 'Bayar Online (Midtrans)';
+                            }
+                        });
+                    } else {
+                        alert(data.message || 'Gagal memulai pembayaran.');
+                        btnPayMidtrans.disabled = false;
+                        btnPayMidtrans.textContent = 'Bayar Online (Midtrans)';
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    alert('Terjadi kesalahan koneksi.');
+                    btnPayMidtrans.disabled = false;
+                    btnPayMidtrans.textContent = 'Bayar Online (Midtrans)';
+                });
+            });
+        }
+    });
+</script>
+@endif
+@endpush

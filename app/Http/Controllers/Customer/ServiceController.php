@@ -108,6 +108,11 @@ class ServiceController extends Controller
     {
         abort_if($serviceOrder->user_id !== Auth::id(), 403);
 
+        // Sync payment status with Midtrans in real-time
+        if ($serviceOrder->payment_method === 'midtrans' && $serviceOrder->payment_status !== 'paid') {
+            $serviceOrder->syncWithMidtrans();
+        }
+
         return view('customer.service.show', compact('serviceOrder'));
     }
 
@@ -135,5 +140,97 @@ class ServiceController extends Controller
         $serviceOrder->update(['status' => 'cancelled']);
 
         return back()->with('success', 'Permintaan servis telah dibatalkan.');
+    }
+
+    /**
+     * Customer chooses Cash payment.
+     */
+    public function payCash(ServiceOrder $serviceOrder)
+    {
+        abort_if($serviceOrder->user_id !== Auth::id(), 403);
+        abort_if($serviceOrder->status !== 'completed', 400);
+        abort_if($serviceOrder->payment_status === 'paid', 400);
+
+        $serviceOrder->update([
+            'payment_method' => 'cash',
+            'payment_status' => 'unpaid',
+        ]);
+
+        return back()->with('success', 'Metode pembayaran Tunai dipilih. Silakan lakukan pembayaran langsung di toko saat pengambilan.');
+    }
+
+    /**
+     * Customer uploads manual bank transfer proof.
+     */
+    public function payTransfer(Request $request, ServiceOrder $serviceOrder)
+    {
+        abort_if($serviceOrder->user_id !== Auth::id(), 403);
+        abort_if($serviceOrder->status !== 'completed', 400);
+        abort_if($serviceOrder->payment_status === 'paid', 400);
+
+        $request->validate([
+            'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:5120',
+        ]);
+
+        $proofPath = $request->file('payment_proof')->store('service-payment-proofs', 'public');
+
+        $serviceOrder->update([
+            'payment_method' => 'transfer',
+            'payment_status' => 'pending',
+            'payment_proof' => $proofPath,
+        ]);
+
+        return back()->with('success', 'Bukti transfer berhasil diunggah. Menunggu verifikasi admin.');
+    }
+
+    /**
+     * Customer initiates Midtrans online payment.
+     */
+    public function payMidtrans(ServiceOrder $serviceOrder)
+    {
+        abort_if($serviceOrder->user_id !== Auth::id(), 403);
+        abort_if($serviceOrder->status !== 'completed', 400);
+        abort_if($serviceOrder->payment_status === 'paid', 400);
+
+        try {
+            \Midtrans\Config::$serverKey = config('midtrans.server_key');
+            \Midtrans\Config::$isProduction = config('midtrans.is_production');
+            \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
+            \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+
+            $params = [
+                'transaction_details' => [
+                    'order_id' => $serviceOrder->service_number,
+                    'gross_amount' => (int) $serviceOrder->final_cost,
+                ],
+                'customer_details' => [
+                    'first_name' => $serviceOrder->contact_name,
+                    'email' => $serviceOrder->user->email,
+                    'phone' => $serviceOrder->contact_phone,
+                ],
+                'callbacks' => [
+                    'finish' => route('customer.service.show', $serviceOrder->id),
+                    'unfinish' => route('customer.service.show', $serviceOrder->id),
+                    'error' => route('customer.service.show', $serviceOrder->id),
+                ],
+            ];
+
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            $serviceOrder->update([
+                'payment_method' => 'midtrans',
+                'snap_token' => $snapToken,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'snap_token' => $snapToken,
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Midtrans Service Snap Token failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal terhubung ke gateway pembayaran: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

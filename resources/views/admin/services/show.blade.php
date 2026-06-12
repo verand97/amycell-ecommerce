@@ -105,9 +105,7 @@
                     <p>Selesai: {{ $serviceOrder->completed_at->translatedFormat('d M Y, H:i') }}</p>
                 @endif
             </div>
-        </div>
-
-        {{-- Cost Summary --}}
+              {{-- Cost Summary --}}
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
             <h3 class="font-bold text-white mb-3">Biaya</h3>
             <div class="space-y-2 text-sm">
@@ -122,17 +120,82 @@
             </div>
         </div>
 
+        {{-- Payment Info Card --}}
+        @if($serviceOrder->status === 'completed' || $serviceOrder->status === 'picked_up' || $serviceOrder->payment_status !== 'unpaid')
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5">
+            <h3 class="font-bold text-white mb-3">Informasi Pembayaran</h3>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Metode</span>
+                    <span class="text-slate-200 font-bold">{{ $serviceOrder->payment_method_label }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Status</span>
+                    @if($serviceOrder->payment_status === 'paid')
+                        <span class="px-2.5 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-bold rounded-lg">Lunas</span>
+                    @elseif($serviceOrder->payment_status === 'pending')
+                        <span class="px-2.5 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold rounded-lg">Menunggu Verifikasi</span>
+                    @else
+                        <span class="px-2.5 py-0.5 bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold rounded-lg">Belum Dibayar</span>
+                    @endif
+                </div>
+                @if($serviceOrder->paid_at)
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Waktu Pembayaran</span>
+                    <span class="text-slate-200 font-mono">{{ $serviceOrder->paid_at->translatedFormat('d M Y, H:i') }}</span>
+                </div>
+                @endif
+
+                @if($serviceOrder->payment_proof)
+                    <div class="pt-2 border-t border-slate-800">
+                        <span class="text-xs text-slate-500 block mb-2">Bukti Transfer:</span>
+                        <a href="{{ $serviceOrder->payment_proof_url }}" target="_blank" class="block rounded-lg overflow-hidden border border-slate-800 hover:border-slate-700 transition-colors">
+                            <img src="{{ $serviceOrder->payment_proof_url }}" alt="Bukti Transfer" class="w-full max-h-40 object-cover">
+                        </a>
+                    </div>
+                    @if($serviceOrder->payment_status === 'pending')
+                        <form method="POST" action="{{ route('admin.services.verify-payment', $serviceOrder->id) }}" class="mt-3">
+                            @csrf
+                            <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-colors shadow-lg shadow-emerald-900/20">
+                                ✓ Verifikasi Pembayaran
+                            </button>
+                        </form>
+                    @endif
+                @endif
+            </div>
+        </div>
+        @endif
+
         {{-- Update Form --}}
         <div class="bg-slate-900 border border-orange-500/20 rounded-2xl p-5">
             <h3 class="font-bold text-white mb-4 flex items-center gap-2">🔄 Update Status</h3>
             <form method="POST" action="{{ route('admin.services.update-status', $serviceOrder->id) }}" class="space-y-4">
                 @csrf
-
+ 
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Status</label>
                     <select name="status" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50">
                         @foreach(['pending' => 'Menunggu', 'received' => 'Diterima', 'diagnosing' => 'Diagnosa', 'waiting_approval' => 'Menunggu Persetujuan', 'repairing' => 'Diperbaiki', 'testing' => 'Pengujian', 'completed' => 'Selesai', 'picked_up' => 'Sudah Diambil', 'cancelled' => 'Dibatalkan'] as $val => $label)
                             <option value="{{ $val }}" {{ $serviceOrder->status === $val ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Status Pembayaran</label>
+                    <select name="payment_status" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50">
+                        @foreach(['unpaid' => 'Belum Dibayar', 'pending' => 'Menunggu Verifikasi', 'paid' => 'Lunas'] as $val => $label)
+                            <option value="{{ $val }}" {{ $serviceOrder->payment_status === $val ? 'selected' : '' }}>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Metode Pembayaran</label>
+                    <select name="payment_method" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50">
+                        <option value="" {{ is_null($serviceOrder->payment_method) ? 'selected' : '' }}>Belum Ditentukan</option>
+                        @foreach(['cash' => 'Tunai (Cash)', 'transfer' => 'Transfer Bank (Manual)', 'midtrans' => 'Online (Midtrans)'] as $val => $label)
+                            <option value="{{ $val }}" {{ $serviceOrder->payment_method === $val ? 'selected' : '' }}>{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>

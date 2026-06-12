@@ -28,6 +28,55 @@ class MidtransWebhookController extends Controller
         $transactionStatus = $request->transaction_status;
         $paymentType = $request->payment_type;
 
+        if (str_starts_with($orderNumber, 'SRV-')) {
+            $serviceOrder = \App\Models\ServiceOrder::where('service_number', $orderNumber)->first();
+            if (!$serviceOrder) {
+                Log::warning('Midtrans Webhook: Service order not found', ['service_number' => $orderNumber]);
+                return response()->json(['message' => 'Service order not found'], 404);
+            }
+
+            DB::beginTransaction();
+            try {
+                if ($transactionStatus == 'capture') {
+                    if ($request->fraud_status == 'challenge') {
+                        $serviceOrder->update([
+                            'payment_status' => 'pending',
+                            'payment_method' => 'midtrans',
+                        ]);
+                    } else if ($request->fraud_status == 'accept') {
+                        $serviceOrder->update([
+                            'payment_status' => 'paid',
+                            'payment_method' => 'midtrans',
+                            'paid_at' => now(),
+                        ]);
+                    }
+                } else if ($transactionStatus == 'settlement') {
+                    $serviceOrder->update([
+                        'payment_status' => 'paid',
+                        'payment_method' => 'midtrans',
+                        'paid_at' => now(),
+                    ]);
+                } else if ($transactionStatus == 'pending') {
+                    $serviceOrder->update([
+                        'payment_status' => 'pending',
+                        'payment_method' => 'midtrans',
+                    ]);
+                } else if (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
+                    $serviceOrder->update([
+                        'payment_status' => 'unpaid',
+                        'payment_method' => 'midtrans',
+                    ]);
+                }
+
+                DB::commit();
+                return response()->json(['message' => 'Success']);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::error('Midtrans Webhook Service Error: ' . $e->getMessage());
+                return response()->json(['message' => 'Error: ' . $e->getMessage()], 500);
+            }
+        }
+
         $order = Order::where('order_number', $orderNumber)->first();
         if (!$order) {
             Log::warning('Midtrans Webhook: Order not found', ['order_number' => $orderNumber]);
