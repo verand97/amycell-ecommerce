@@ -49,6 +49,40 @@
                 </a>
 
                 @auth
+                    @if(auth()->user()->isAdmin())
+                        {{-- Bell Notification --}}
+                        <div class="relative mr-1" id="admin-bell-dropdown-container">
+                            <button id="admin-bell-btn" class="relative p-2.5 rounded-xl bg-slate-100 hover:bg-sky-100 hover:text-sky-600 transition-all group">
+                                <svg class="w-5 h-5 text-slate-600 group-hover:text-sky-600 transition-transform group-hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                </svg>
+                                <span id="admin-bell-badge" class="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-extrabold w-4.5 h-4.5 rounded-full flex items-center justify-center animate-pulse" style="display: none;">0</span>
+                            </button>
+                            {{-- Dropdown --}}
+                            <div id="admin-bell-dropdown" class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 hidden" style="display: none;">
+                                <div class="px-4 py-2 border-b border-slate-100 flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-bold text-slate-800">Notifikasi Admin</p>
+                                        <p class="text-[10px] text-slate-400" id="admin-bell-unread-text">0 Belum Dibaca</p>
+                                    </div>
+                                    <button id="admin-bell-mark-all" class="text-xs font-semibold text-sky-500 hover:text-sky-600 transition-colors">Tandai semua dibaca</button>
+                                </div>
+                                <div class="max-h-72 overflow-y-auto" id="admin-bell-list">
+                                    {{-- List items dynamically loaded --}}
+                                    <div class="px-4 py-8 text-center text-slate-400">
+                                        <svg class="w-8 h-8 mx-auto mb-2 text-slate-300 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89"/>
+                                        </svg>
+                                        <p class="text-xs">Memuat notifikasi...</p>
+                                    </div>
+                                </div>
+                                <div class="px-4 py-2 border-t border-slate-100 text-center bg-slate-50/50 rounded-b-2xl">
+                                    <a href="{{ route('admin.dashboard') }}" class="text-xs font-semibold text-sky-600 hover:text-sky-700 transition-colors">Buka Panel Admin →</a>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="relative" x-data="{ open: false }">
                         <button @click="open = !open" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 hover:bg-sky-50 transition-all">
                             <img src="{{ auth()->user()->avatar_url }}" class="w-7 h-7 rounded-full object-cover" alt="Avatar">
@@ -200,6 +234,124 @@ document.querySelectorAll('[x-data]').forEach(el => {
             dropdown.style.display = 'none';
         });
     }
+});
+
+// Admin Notification Bell Dropdown & Polling
+document.addEventListener('DOMContentLoaded', function() {
+    const bellBtn = document.getElementById('admin-bell-btn');
+    const bellDropdown = document.getElementById('admin-bell-dropdown');
+    const bellBadge = document.getElementById('admin-bell-badge');
+    const bellUnreadText = document.getElementById('admin-bell-unread-text');
+    const bellList = document.getElementById('admin-bell-list');
+    const markAllBtn = document.getElementById('admin-bell-mark-all');
+
+    if (!bellBtn) return;
+
+    // Toggle dropdown
+    bellBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const isHidden = bellDropdown.style.display === 'none';
+        bellDropdown.style.display = isHidden ? 'block' : 'none';
+        
+        // Close user dropdown if open
+        const userDropdown = document.querySelector('[x-data] [x-show]');
+        if (userDropdown) userDropdown.style.display = 'none';
+    });
+
+    // Close dropdown on click outside
+    document.addEventListener('click', function() {
+        if (bellDropdown) bellDropdown.style.display = 'none';
+    });
+
+    bellDropdown.addEventListener('click', function(e) {
+        e.stopPropagation(); // prevent closing
+    });
+
+    // Fetch notifications function
+    function fetchNotifications() {
+        fetch('/admin/notifications')
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                // Update badge
+                if (data.unread_count > 0) {
+                    bellBadge.textContent = data.unread_count;
+                    bellBadge.style.display = 'flex';
+                    bellUnreadText.textContent = data.unread_count + ' Belum Dibaca';
+                } else {
+                    bellBadge.style.display = 'none';
+                    bellUnreadText.textContent = 'Tidak ada notifikasi baru';
+                }
+
+                // Render list items
+                if (data.notifications.length === 0) {
+                    bellList.innerHTML = `
+                        <div class="px-4 py-8 text-center text-slate-400">
+                            <svg class="w-8 h-8 mx-auto mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+                            </svg>
+                            <p class="text-xs">Belum ada notifikasi baru</p>
+                        </div>
+                    `;
+                } else {
+                    let html = '';
+                    data.notifications.forEach(notif => {
+                        const iconBg = notif.type === 'order' ? 'bg-sky-500/10 text-sky-600' : 'bg-orange-500/10 text-orange-600';
+                        const iconSvg = notif.type === 'order' 
+                            ? `<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>`
+                            : `<svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>`;
+                        
+                        const unreadDot = notif.read_at === null 
+                            ? `<span class="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0 self-center"></span>` 
+                            : '';
+                        
+                        const itemClass = notif.read_at === null ? 'bg-sky-500/5 hover:bg-sky-500/10' : 'hover:bg-slate-50';
+
+                        html += `
+                            <a href="${notif.link}" class="flex items-start gap-3 px-4 py-3 border-b border-slate-50 transition-all ${itemClass}">
+                                <div class="w-8 h-8 rounded-xl ${iconBg} flex items-center justify-center shrink-0">
+                                    ${iconSvg}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-xs font-semibold text-slate-800 truncate">${notif.title}</p>
+                                    <p class="text-[11px] text-slate-500 line-clamp-2 mt-0.5">${notif.message}</p>
+                                    <span class="text-[9px] text-slate-400 mt-1 block">${notif.created_at_human}</span>
+                                </div>
+                                ${unreadDot}
+                            </a>
+                        `;
+                    });
+                    bellList.innerHTML = html;
+                }
+            })
+            .catch(err => console.error('[Amycell] Error fetching notifications:', err));
+    }
+
+    // Mark all as read
+    markAllBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        fetch('/admin/notifications/mark-read', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                fetchNotifications();
+            }
+        })
+        .catch(err => console.error('[Amycell] Error marking all read:', err));
+    });
+
+    // Initial load & Poll every 30 seconds
+    fetchNotifications();
+    setInterval(fetchNotifications, 30000);
 });
 </script>
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\ServiceOrder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ServiceController extends Controller
 {
@@ -14,8 +15,8 @@ class ServiceController extends Controller
     public function landing()
     {
         $serviceOrders = null;
-        if (auth()->check()) {
-            $serviceOrders = ServiceOrder::where('user_id', auth()->id())
+        if (Auth::check()) {
+            $serviceOrders = ServiceOrder::where('user_id', Auth::id())
                 ->latest()
                 ->take(3)
                 ->get();
@@ -29,7 +30,7 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $serviceOrders = ServiceOrder::where('user_id', auth()->id())
+        $serviceOrders = ServiceOrder::where('user_id', Auth::id())
             ->latest()
             ->paginate(10);
 
@@ -69,7 +70,7 @@ class ServiceController extends Controller
 
         $serviceOrder = ServiceOrder::create([
             'service_number'     => ServiceOrder::generateServiceNumber(),
-            'user_id'            => auth()->id(),
+            'user_id'            => Auth::id(),
             'device_brand'       => $request->device_brand,
             'device_model'       => $request->device_model,
             'device_color'       => $request->device_color,
@@ -83,6 +84,18 @@ class ServiceController extends Controller
             'status'             => 'pending',
         ]);
 
+        // Create Admin Notification
+        try {
+            \App\Models\AdminNotification::create([
+                'title' => 'Permintaan Servis 🔧',
+                'message' => 'Permintaan servis ' . $serviceOrder->service_number . ' (' . $serviceOrder->device_brand . ' ' . $serviceOrder->device_model . ') dari ' . $serviceOrder->contact_name,
+                'type' => 'service',
+                'link' => route('admin.services.show', $serviceOrder->id, false),
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('Failed to create Admin Notification for service order: ' . $e->getMessage());
+        }
+
         return redirect()
             ->route('customer.service.show', $serviceOrder->id)
             ->with('success', 'Permintaan servis berhasil diajukan! Nomor servis: ' . $serviceOrder->service_number);
@@ -93,7 +106,7 @@ class ServiceController extends Controller
      */
     public function show(ServiceOrder $serviceOrder)
     {
-        abort_if($serviceOrder->user_id !== auth()->id(), 403);
+        abort_if($serviceOrder->user_id !== Auth::id(), 403);
 
         return view('customer.service.show', compact('serviceOrder'));
     }
@@ -103,7 +116,7 @@ class ServiceController extends Controller
      */
     public function approve(ServiceOrder $serviceOrder)
     {
-        abort_if($serviceOrder->user_id !== auth()->id(), 403);
+        abort_if($serviceOrder->user_id !== Auth::id(), 403);
         abort_if($serviceOrder->status !== 'waiting_approval', 400);
 
         $serviceOrder->update(['status' => 'repairing']);
@@ -116,7 +129,7 @@ class ServiceController extends Controller
      */
     public function cancel(ServiceOrder $serviceOrder)
     {
-        abort_if($serviceOrder->user_id !== auth()->id(), 403);
+        abort_if($serviceOrder->user_id !== Auth::id(), 403);
         abort_if(in_array($serviceOrder->status, ['completed', 'picked_up', 'cancelled']), 400);
 
         $serviceOrder->update(['status' => 'cancelled']);

@@ -117,6 +117,18 @@ class CheckoutController extends Controller
                 \Illuminate\Support\Facades\Log::warning('Midtrans Snap Token generation failed: ' . $e->getMessage());
             }
 
+            // Create Admin Notification
+            try {
+                \App\Models\AdminNotification::create([
+                    'title' => 'Pesanan Baru 🛒',
+                    'message' => 'Pesanan baru ' . $order->order_number . ' senilai Rp' . number_format((float) $order->total_amount, 0, ',', '.') . ' oleh ' . $order->user->name,
+                    'type' => 'order',
+                    'link' => route('admin.orders.show', $order->id, false),
+                ]);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Failed to create Admin Notification for order: ' . $e->getMessage());
+            }
+
             Session::forget('cart');
             DB::commit();
 

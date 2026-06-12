@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Route;
 
 // ─── Public Routes ───────────────────────────────────────────────────────────
 Route::get('/', [Customer\HomeController::class, 'index'])->name('home');
+Route::get('/dashboard', function () {
+    return redirect()->route('home');
+})->name('dashboard');
 Route::get('/catalog', [Customer\HomeController::class, 'catalog'])->name('catalog');
 Route::get('/catalog/{product:slug}', [Customer\HomeController::class, 'showProduct'])->name('catalog.show');
 
@@ -75,6 +78,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
 
     Route::get('/dashboard', [Admin\DashboardController::class, 'index'])->name('dashboard');
+
+    // Notifications
+    Route::get('/notifications', [Admin\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-read', [Admin\NotificationController::class, 'markAllRead'])->name('notifications.mark-read');
+    Route::get('/notifications/{notification}/read', [Admin\NotificationController::class, 'markAsRead'])->name('notifications.read');
 
     // Products CRUD
     Route::resource('products', Admin\ProductController::class);
