@@ -16,6 +16,11 @@
             <div>
                 <h1 class="text-2xl font-black text-slate-800">Detail Servis</h1>
                 <p class="text-sm text-slate-500 font-mono mt-1">{{ $serviceOrder->service_number }}</p>
+                @if($serviceOrder->fifo_position)
+                    <div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-orange-50 text-orange-700 text-xs font-bold rounded-xl border border-orange-100 animate-pulse">
+                        ⏳ Posisi Antrean FIFO: #{{ $serviceOrder->fifo_position }}
+                    </div>
+                @endif
             </div>
             @php
                 $sc = match($serviceOrder->status_color) {

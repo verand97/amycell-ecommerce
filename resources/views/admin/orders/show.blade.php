@@ -13,6 +13,11 @@
                 <div>
                     <p class="font-mono text-lg font-black text-white">{{ $order->order_number }}</p>
                     <p class="text-xs text-slate-400">{{ $order->created_at->format('d F Y, H:i') }}</p>
+                    @if($order->fifo_position)
+                        <div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-sky-500/10 text-sky-400 text-xs font-bold rounded-xl border border-sky-500/20">
+                            ⏳ Posisi Antrean FIFO: #{{ $order->fifo_position }}
+                        </div>
+                    @endif
                 </div>
                 @php
                     $statusClass = match($order->status_color) {

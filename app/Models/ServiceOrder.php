@@ -132,4 +132,22 @@ class ServiceOrder extends Model
     {
         return $query->whereNotIn('status', ['completed', 'picked_up', 'cancelled']);
     }
+
+    public function getFifoPositionAttribute(): ?int
+    {
+        if (in_array($this->status, ['completed', 'picked_up', 'cancelled'])) {
+            return null;
+        }
+
+        $statuses = [];
+        if ($this->status === 'pending') {
+            $statuses = ['pending'];
+        } else {
+            $statuses = ['received', 'diagnosing', 'waiting_approval', 'repairing', 'testing'];
+        }
+
+        return self::whereIn('status', $statuses)
+            ->where('created_at', '<', $this->created_at)
+            ->count() + 1;
+    }
 }

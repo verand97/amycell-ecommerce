@@ -17,6 +17,11 @@
                 <p class="text-xs text-slate-400 mb-1">Nomor Pesanan</p>
                 <p class="font-mono text-xl font-black text-slate-800">{{ $order->order_number }}</p>
                 <p class="text-xs text-slate-400 mt-1">{{ $order->created_at->format('d F Y, H:i') }}</p>
+                @if($order->fifo_position)
+                    <div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 bg-sky-50 text-sky-700 text-xs font-bold rounded-xl border border-sky-100 animate-pulse">
+                        ⏳ Posisi Antrean FIFO: #{{ $order->fifo_position }}
+                    </div>
+                @endif
             </div>
             <div class="text-right">
                 @php

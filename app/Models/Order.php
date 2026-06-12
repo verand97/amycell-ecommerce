@@ -198,4 +198,24 @@ class Order extends Model
             return false;
         }
     }
+
+    public function getFifoPositionAttribute(): ?int
+    {
+        if (in_array($this->status, ['completed', 'cancelled', 'refunded'])) {
+            return null;
+        }
+
+        $statuses = [];
+        if ($this->status === 'awaiting_payment') {
+            $statuses = ['awaiting_payment'];
+        } elseif ($this->status === 'payment_uploaded') {
+            $statuses = ['payment_uploaded'];
+        } else { // paid, processing, shipped
+            $statuses = ['paid', 'processing'];
+        }
+
+        return self::whereIn('status', $statuses)
+            ->where('created_at', '<', $this->created_at)
+            ->count() + 1;
+    }
 }

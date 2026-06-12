@@ -23,6 +23,20 @@
     @endforeach
 </div>
 
+{{-- FIFO Banner --}}
+<div class="mb-4 bg-linear-to-r from-sky-950 to-slate-900 border border-sky-800/40 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-sky-500/10 rounded-xl flex items-center justify-center text-lg text-sky-400">⏳</div>
+        <div>
+            <h4 class="text-sm font-bold text-slate-200">Antrean Pemrosesan FIFO (First In First Out)</h4>
+            <p class="text-xs text-slate-400">Pesanan diurutkan dari yang tertua untuk memastikan pemrosesan tepat waktu sesuai urutan masuk.</p>
+        </div>
+    </div>
+    <div>
+        <span class="inline-block px-3 py-1 bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[10px] font-bold uppercase tracking-wider rounded-lg">Metode FIFO Aktif</span>
+    </div>
+</div>
+
 {{-- Search --}}
 <form method="GET" class="mb-4 flex gap-2">
     <input type="hidden" name="status" value="{{ request('status') }}">
@@ -35,7 +49,7 @@
     <table class="w-full text-sm">
         <thead>
             <tr class="border-b border-slate-800">
-                <th class="px-5 py-3.5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">No. Pesanan</th>
+                <th class="px-5 py-3.5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">No. Pesanan / Antrean</th>
                 <th class="px-4 py-3.5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Pelanggan</th>
                 <th class="px-4 py-3.5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Total</th>
                 <th class="px-4 py-3.5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Status</th>
@@ -48,6 +62,11 @@
             <tr class="hover:bg-slate-800/40 transition-colors">
                 <td class="px-5 py-3.5">
                     <p class="font-mono text-xs text-slate-200 font-bold">{{ $order->order_number }}</p>
+                    @if($order->fifo_position)
+                        <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[10px] font-semibold rounded-md">
+                            ⏳ Antrean #{{ $order->fifo_position }}
+                        </span>
+                    @endif
                 </td>
                 <td class="px-4 py-3.5">
                     <p class="text-sm text-slate-300 font-medium">{{ $order->user->name }}</p>

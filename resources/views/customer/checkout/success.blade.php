@@ -52,33 +52,25 @@
     </div>
 
     {{-- Midtrans Snap Payment --}}
+    @if($order->status === 'awaiting_payment')
     <div class="bg-slate-50 border border-slate-200 rounded-3xl p-6 mb-6 text-left">
-        @if($order->status === 'awaiting_payment')
-            <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
-                💳 Selesaikan Pembayaran
-            </h3>
-            <p class="text-xs text-slate-505 mb-4">Silakan klik tombol di bawah untuk membayar secara aman via Midtrans menggunakan Virtual Account, QRIS, E-Wallet, atau Kartu Kredit.</p>
+        <h3 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+            💳 Selesaikan Pembayaran
+        </h3>
+        <p class="text-xs text-slate-505 mb-4">Silakan klik tombol di bawah untuk membayar secara aman via Midtrans menggunakan Virtual Account, QRIS, E-Wallet, atau Kartu Kredit.</p>
 
-            @if($order->snap_token)
-                <button id="pay-button" class="w-full py-3.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-2xl transition-all text-sm cursor-pointer shadow-md hover:shadow-lg flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
-                    Bayar Sekarang
-                </button>
-            @else
-                <div class="p-3 bg-red-50 text-red-600 rounded-xl text-xs font-semibold text-center">
-                    Gagal memuat sesi pembayaran Midtrans. Silakan muat ulang halaman ini.
-                </div>
-            @endif
+        @if($order->snap_token)
+            <button id="pay-button" class="w-full py-3.5 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-2xl transition-all text-sm cursor-pointer shadow-md hover:shadow-lg flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                Bayar Sekarang
+            </button>
         @else
-            <div class="flex items-center gap-3 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
-                <span class="text-2xl">✅</span>
-                <div>
-                    <h4 class="font-bold text-sm">Pembayaran Berhasil</h4>
-                    <p class="text-xs text-emerald-600">Terima kasih, pembayaran Anda telah diterima dan pesanan sedang diproses.</p>
-                </div>
+            <div class="p-3 bg-red-50 text-red-600 rounded-xl text-xs font-semibold text-center">
+                Gagal memuat sesi pembayaran Midtrans. Silakan muat ulang halaman ini.
             </div>
         @endif
     </div>
+    @endif
 
     @if($order->status === 'awaiting_payment' && $order->snap_token)
     @push('scripts')

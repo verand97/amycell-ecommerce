@@ -10,7 +10,7 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::with(['user', 'transaction'])->latest();
+        $query = Order::with(['user', 'transaction'])->oldest(); // FIFO: Oldest orders first
 
         if ($request->status) {
             $query->where('status', $request->status);

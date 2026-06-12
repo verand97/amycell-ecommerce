@@ -158,8 +158,12 @@ class CheckoutController extends Controller
     {
         $order = Order::where('order_number', $orderNumber)
             ->where('user_id', Auth::id())
-            ->with('items')
             ->firstOrFail();
+
+        // Sync payment status with Midtrans in real-time
+        $order->syncWithMidtrans();
+
+        $order->load('items');
 
         if (empty($order->snap_token) && $order->status === 'awaiting_payment') {
             try {

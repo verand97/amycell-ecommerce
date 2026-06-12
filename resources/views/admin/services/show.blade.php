@@ -92,6 +92,9 @@
             @endphp
             <div class="p-3 rounded-xl border {{ $statusClasses }} text-center">
                 <p class="font-bold text-lg">{{ $serviceOrder->status_label }}</p>
+                @if($serviceOrder->fifo_position)
+                    <p class="text-xs mt-1.5 font-bold uppercase tracking-wider">Antrean FIFO: #{{ $serviceOrder->fifo_position }}</p>
+                @endif
             </div>
             <div class="mt-3 text-xs text-slate-500 space-y-1">
                 <p>Dibuat: {{ $serviceOrder->created_at->translatedFormat('d M Y, H:i') }}</p>

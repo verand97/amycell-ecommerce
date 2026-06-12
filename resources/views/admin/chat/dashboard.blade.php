@@ -8,15 +8,15 @@
 <div class="grid grid-cols-3 gap-4 mb-5">
     <div class="bg-slate-900 border border-amber-500/20 rounded-2xl p-4 text-center">
         <p id="total-waiting" class="text-2xl font-black text-amber-400">{{ $totalWaiting }}</p>
-        <p class="text-xs text-slate-400 mt-1">Dalam Antrian</p>
+        <p class="text-xs text-slate-400 mt-1">Antrean Chat</p>
     </div>
     <div class="bg-slate-900 border border-sky-500/20 rounded-2xl p-4 text-center">
         <p id="total-active" class="text-2xl font-black text-sky-400">{{ $totalActive }}</p>
-        <p class="text-xs text-slate-400 mt-1">Sesi Aktif</p>
+        <p class="text-xs text-slate-400 mt-1">Sesi Chat Aktif</p>
     </div>
     <div class="bg-slate-900 border border-emerald-500/20 rounded-2xl p-4 text-center">
         <p class="text-2xl font-black text-emerald-400">{{ $closedToday }}</p>
-        <p class="text-xs text-slate-400 mt-1">Selesai Hari Ini</p>
+        <p class="text-xs text-slate-400 mt-1">Chat Selesai Hari Ini</p>
     </div>
 </div>
 
@@ -26,8 +26,8 @@
     <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
             <div>
-                <h3 class="font-bold text-white">⏳ Antrian Menunggu</h3>
-                <p class="text-xs text-slate-500 mt-0.5">FIFO · Pelanggan pertama masuk, pertama dilayani</p>
+                <h3 class="font-bold text-white">⏳ Antrean Chat Menunggu</h3>
+                <p class="text-xs text-slate-500 mt-0.5">FIFO · Customer menunggu untuk diterima chat</p>
             </div>
             <span class="px-2.5 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-full" id="queue-badge">{{ $totalWaiting }}</span>
         </div>
@@ -52,7 +52,7 @@
             @empty
             <div id="empty-queue" class="text-center py-10 text-slate-500">
                 <div class="text-3xl mb-2">🎉</div>
-                <p class="text-sm">Tidak ada pelanggan dalam antrian</p>
+                <p class="text-sm">Tidak ada customer dalam antrean chat</p>
             </div>
             @endforelse
         </div>
@@ -180,7 +180,7 @@ async function acceptSession(sessionId, customerName) {
             const queueDiv = document.getElementById('waiting-queue');
             if (queueDiv && queueDiv.querySelectorAll('[id^="queue-item-"]').length === 0) {
                 if (!document.getElementById('empty-queue')) {
-                    queueDiv.innerHTML = `<div id="empty-queue" class="text-center py-10 text-slate-500"><div class="text-3xl mb-2">🎉</div><p class="text-sm">Tidak ada pelanggan dalam antrian</p></div>`;
+                    queueDiv.innerHTML = `<div id="empty-queue" class="text-center py-10 text-slate-500"><div class="text-3xl mb-2">🎉</div><p class="text-sm">Tidak ada customer dalam antrean chat</p></div>`;
                 }
             }
 
@@ -437,7 +437,7 @@ function rebuildWaitingQueue(queue) {
     if (!container) return;
 
     if (queue.length === 0) {
-        container.innerHTML = `<div id="empty-queue" class="text-center py-10 text-slate-500"><div class="text-3xl mb-2">🎉</div><p class="text-sm">Tidak ada pelanggan dalam antrian</p></div>`;
+        container.innerHTML = `<div id="empty-queue" class="text-center py-10 text-slate-500"><div class="text-3xl mb-2">🎉</div><p class="text-sm">Tidak ada customer dalam antrean chat</p></div>`;
         return;
     }
 

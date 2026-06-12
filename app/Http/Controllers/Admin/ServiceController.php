@@ -13,7 +13,7 @@ class ServiceController extends Controller
      */
     public function index(Request $request)
     {
-        $query = ServiceOrder::with('user')->latest();
+        $query = ServiceOrder::with('user')->oldest(); // FIFO: Oldest service requests first
 
         // Filter by status
         if ($request->filled('status')) {

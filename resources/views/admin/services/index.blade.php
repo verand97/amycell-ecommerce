@@ -55,13 +55,27 @@
     </form>
 </div>
 
+{{-- FIFO Banner --}}
+<div class="mb-4 bg-linear-to-r from-orange-950 to-slate-900 border border-orange-800/40 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-orange-500/10 rounded-xl flex items-center justify-center text-lg text-orange-400">⏳</div>
+        <div>
+            <h4 class="text-sm font-bold text-slate-200">Antrean Perbaikan HP FIFO (First In First Out)</h4>
+            <p class="text-xs text-slate-400">Permintaan servis diurutkan berdasarkan pendaftaran terawal agar ditangani teknisi sesuai antrean.</p>
+        </div>
+    </div>
+    <div>
+        <span class="inline-block px-3 py-1 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold uppercase tracking-wider rounded-lg">Metode FIFO Aktif</span>
+    </div>
+</div>
+
 {{-- Table --}}
 <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr class="border-b border-slate-800">
-                    <th class="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">No. Servis</th>
+                    <th class="px-5 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">No. Servis / Antrean</th>
                     <th class="px-3 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Customer</th>
                     <th class="px-3 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Perangkat</th>
                     <th class="px-3 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wide">Kerusakan</th>
@@ -89,7 +103,12 @@
                     @endphp
                     <tr class="hover:bg-slate-800/50 transition-colors">
                         <td class="px-5 py-3">
-                            <p class="font-mono text-xs text-sky-400">{{ $svc->service_number }}</p>
+                            <p class="font-mono text-xs text-sky-400 font-bold">{{ $svc->service_number }}</p>
+                            @if($svc->fifo_position)
+                                <span class="inline-flex items-center gap-1 mt-1 px-2 py-0.5 bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-semibold rounded-md">
+                                    ⏳ Antrean #{{ $svc->fifo_position }}
+                                </span>
+                            @endif
                         </td>
                         <td class="px-3 py-3">
                             <p class="text-xs font-medium text-slate-200">{{ $svc->user->name }}</p>
